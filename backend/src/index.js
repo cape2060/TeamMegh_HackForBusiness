@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fileUpload = require('express-fileupload');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require('dotenv').config();
 
@@ -31,10 +32,36 @@ const app = express();
 // Middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
-app.use(cors());
+
+// Enable CORS for all routes with specific options
+app.use(cors({
+  origin: ['http://localhost:3000'], // Frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+// Handle preflight requests
+app.options('*', cors());
+
+// File upload middleware
+app.use(fileUpload({
+  createParentPath: true,
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max file size
+  abortOnLimit: true,
+  useTempFiles: true,
+  tempFileDir: path.join(__dirname, '../../temp/uploads/')
+}));
 
 // Static files for temporary access
-app.use('/temp', express.static(path.join(__dirname, '../../temp')));
+// Log the static file paths for debugging
+const tempPath1 = path.join(__dirname, '../temp');
+const tempPath2 = path.join(__dirname, '../../temp');
+console.log('Serving static files from:', tempPath1);
+console.log('Serving static files from:', tempPath2);
+
+app.use('/temp', express.static(tempPath1));
+app.use('/temp', express.static(tempPath2));
 
 // Routes - no authentication for demo
 app.use('/api/users', userRoutes);
@@ -42,8 +69,55 @@ app.use('/api/business-data', businessDataRoutes);
 app.use('/api/analysis', analysisRoutes);
 app.use('/api/bcg-matrix', bcgMatrixRoutes);
 
+// Health check endpoint with detailed info
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'API is running' });
+  // Include filesystem access test
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    
+    const tempDirPath = path.join(__dirname, '../../temp');
+    const tempOutputPath = path.join(tempDirPath, 'output');
+    
+    // Check if directories exist
+    const tempDirExists = fs.existsSync(tempDirPath);
+    const tempOutputExists = fs.existsSync(tempOutputPath);
+    
+    // Try creating a test file
+    const testFilePath = path.join(tempOutputPath, `test_${Date.now()}.txt`);
+    fs.writeFileSync(testFilePath, 'test');
+    const canWrite = fs.existsSync(testFilePath);
+    
+    // Try to clean up
+    try {
+      if (canWrite) {
+        fs.unlinkSync(testFilePath);
+      }
+    } catch (cleanupError) {
+      console.error('Error during cleanup:', cleanupError);
+    }
+    
+    res.json({
+      status: 'ok',
+      message: 'API is running',
+      fileSystem: {
+        tempDirExists,
+        tempOutputExists,
+        canWrite,
+        paths: {
+          tempDir: tempDirPath,
+          tempOutput: tempOutputPath
+        }
+      },
+      time: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'API health check failed',
+      error: error.message
+    });
+  }
 });
 
 // Error handling middleware

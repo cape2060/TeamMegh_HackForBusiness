@@ -7,12 +7,12 @@ import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Factory, Bell, Settings, LogOut, Search, BarChart3, Lightbulb, Target, Megaphone, Upload, FileUp, Database, Eye } from "lucide-react"
+import { Factory, Settings, LogOut, Search, BarChart3, Lightbulb, Target, Megaphone, Upload, FileUp, Database, Eye } from "lucide-react"
 
 export default function DashboardPage() {
   const router = useRouter()
   const { theme } = useTheme()
-  const [unreadNotifications, setUnreadNotifications] = useState(0)
+  // Notifications removed
   const [userName, setUserName] = useState("")
   const [companyName, setCompanyName] = useState("Your Company")
   const [isLoading, setIsLoading] = useState(true)
@@ -68,8 +68,7 @@ export default function DashboardPage() {
           console.error("Error fetching company data:", error)
         }
 
-        // For demo purposes, set a random number of notifications
-        setUnreadNotifications(Math.floor(Math.random() * 5))
+        // Notifications removed
         
         // Load uploaded data from localStorage - only for current user
         const savedData = JSON.parse(localStorage.getItem('uploadedData') || '[]')
@@ -202,16 +201,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/dashboard/notifications">
-              <Button variant="outline" size="sm" className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 relative">
-                <Bell className="h-4 w-4" />
-                {unreadNotifications > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold">
-                    {unreadNotifications}
-                  </span>
-                )}
-              </Button>
-            </Link>
+            {/* Notifications removed */}
             <Link href="/dashboard/settings">
               <Button variant="outline" size="sm" className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
                 <Settings className="h-4 w-4" />
@@ -257,25 +247,7 @@ export default function DashboardPage() {
           })}
         </div>
 
-        {/* Quick Stats */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700">
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">5</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Active Products</div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">78%</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Research Complete</div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700">
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">12</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Strategies Created</div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border dark:border-gray-700">
-            <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">3</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Prototypes Testing</div>
-          </div>
-        </div>
+        {/* Stats section removed */}
       </div>
     </div>
   )

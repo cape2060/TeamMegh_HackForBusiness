@@ -59,7 +59,7 @@ const safeJsonParse = (text: string, context: string = "unknown") => {
 
 // Define interface for strategy objects
 interface Strategy {
-  id: number;
+  id: string | number;  // Use string or number IDs for flexibility
   name: string;
   description: string;
   type: string;
@@ -104,62 +104,12 @@ const emptyStrategy: Strategy = {
 };
 
 export default function StrategiesPage() {
-  const [strategies, setStrategies] = useState<Strategy[]>([
-    {
-      id: 1,
-      name: "Customer Retention Campaign",
-      description: "Re-engage customers who haven't purchased in 30+ days",
-      type: "Retention",
-      status: "Active",
-      progress: 65,
-      targetAudience: "Inactive customers (30+ days)",
-      channels: ["Email", "WhatsApp", "SMS"],
-      metrics: {
-        reach: "1,250 customers",
-        engagement: "23%",
-        conversion: "8.5%",
-        revenue: "₹45,000",
-      },
-    },
-    {
-      id: 2,
-      name: "New Product Launch",
-      description: "Introduce Cold Brew Tea Concentrate to target market",
-      type: "Launch",
-      status: "Planning",
-      progress: 30,
-      targetAudience: "Office workers, Health enthusiasts",
-      channels: ["Social Media", "Influencers", "Sampling"],
-      metrics: {
-        reach: "5,000 prospects",
-        engagement: "15%",
-        conversion: "12%",
-        revenue: "₹120,000",
-      },
-    },
-    {
-      id: 3,
-      name: "Premium Upsell Strategy",
-      description: "Convert regular customers to premium product lines",
-      type: "Upsell",
-      status: "Draft",
-      progress: 10,
-      targetAudience: "Frequent buyers, High-value customers",
-      channels: ["In-store", "Email", "Personal calls"],
-      metrics: {
-        reach: "800 customers",
-        engagement: "35%",
-        conversion: "18%",
-        revenue: "₹85,000",
-      },
-    },
-  ])
+  const [strategies, setStrategies] = useState<Strategy[]>([])
 
   const [userDatasets, setUserDatasets] = useState<any[]>([])
   const [selectedDataset, setSelectedDataset] = useState<string>("")
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false)
   const [aiStrategies, setAiStrategies] = useState<Strategy[]>([])
-  const [activeTab, setActiveTab] = useState<string>("existing")
   const [analysisError, setAnalysisError] = useState<string | null>(null)
   const [usingFallback, setUsingFallback] = useState<boolean>(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false)
@@ -170,7 +120,29 @@ export default function StrategiesPage() {
   const [isImplementDialogOpen, setIsImplementDialogOpen] = useState<boolean>(false)
   const [strategyToImplement, setStrategyToImplement] = useState<Strategy | null>(null)
 
+  // Effect to sync AI strategies with localStorage whenever they change
   useEffect(() => {
+    if (aiStrategies.length > 0) {
+      localStorage.setItem('aiMarketingStrategies', JSON.stringify(aiStrategies));
+      console.log(`Saved ${aiStrategies.length} AI strategies to localStorage`);
+    }
+  }, [aiStrategies]);
+  
+  useEffect(() => {
+    // Load AI strategies from localStorage
+    try {
+      const localAiStrategies = localStorage.getItem('aiMarketingStrategies');
+      if (localAiStrategies) {
+        const parsedAiStrategies = JSON.parse(localAiStrategies);
+        if (Array.isArray(parsedAiStrategies) && parsedAiStrategies.length > 0) {
+          console.log(`Loaded ${parsedAiStrategies.length} AI strategies from localStorage`);
+          setAiStrategies(parsedAiStrategies);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading AI strategies from localStorage:', error);
+    }
+    
     // Load user datasets from local storage first
     const localData = JSON.parse(localStorage.getItem('uploadedData') || '[]');
     setUserDatasets(localData);
@@ -270,7 +242,7 @@ export default function StrategiesPage() {
                   
                   // Ensure analysis_content is a string
                   if (typeof analysis.analysis_content !== 'string') {
-                    console.error(`Analysis ID ${analysis.id} has non-string content:`, analysis.analysis_content);
+                    
                     
                     // If it's already an object, we can try to use it directly
                     if (typeof analysis.analysis_content === 'object' && analysis.analysis_content !== null) {
@@ -393,201 +365,6 @@ export default function StrategiesPage() {
     fetchSavedStrategies();
   }, []);
 
-  // Fetch all saved strategies before generating new ones
-  const fetchAllSavedStrategies = async (): Promise<Strategy[]> => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) return [];
-      
-      const response = await fetch('http://localhost:5000/api/analysis/type/strategy_draft', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      // Log response status and headers
-      console.log("fetchAllSavedStrategies response status:", response.status, response.statusText);
-      const headers: Record<string, string> = {};
-      response.headers.forEach((value, key) => {
-        headers[key] = value;
-      });
-      console.log("fetchAllSavedStrategies response headers:", headers);
-      
-      if (response.ok) {
-        // Get the raw text response
-        const responseText = await response.text();
-        
-        // Try to parse the response as JSON using our safe parser
-        const savedAnalysesResult = safeJsonParse(responseText, "fetchAllSavedStrategies");
-        
-        if (savedAnalysesResult && Array.isArray(savedAnalysesResult) && savedAnalysesResult.length > 0) {
-          // Extract strategies from analysis content
-          const savedStrategies = savedAnalysesResult
-            .map((analysis: any) => {
-              try {
-                // Skip if analysis_content is empty or undefined
-                if (!analysis.analysis_content) {
-                  console.log(`Analysis ID ${analysis.id} has empty content, skipping`);
-                  return null;
-                }
-                
-                // Special handling for empty objects
-                if (analysis.analysis_content === '{}') {
-                  console.log(`Analysis ID ${analysis.id} has empty object content {}, skipping`);
-                  return null;
-                }
-                
-                // First, ensure analysis_content is a string
-                if (typeof analysis.analysis_content !== 'string') {
-                  console.error(`Analysis ID ${analysis.id} has non-string content:`, analysis.analysis_content);
-                  
-                  // If it's already an object, we can try to use it directly
-                  if (typeof analysis.analysis_content === 'object' && analysis.analysis_content !== null) {
-                    console.log(`Analysis ID ${analysis.id} already has object content, using directly`);
-                    const directContent = analysis.analysis_content;
-                    
-                    // Check if this already has a strategy property
-                    if (directContent.strategy) {
-                      return {
-                        ...directContent.strategy,
-                        dbId: analysis.id,
-                        dataSource: {
-                          id: analysis.data_id,
-                          name: directContent.strategy.dataSource?.name || 'Unknown dataset'
-                        }
-                      };
-                    }
-                  }
-                  
-                  return null;
-                }
-                
-                                  // Display problematic content for debugging
-                if (analysis.id === 25 || analysis.id === 29) {
-                  // Create a type-safe log object
-                  let contentToLog: Record<string, any> = {
-                    rawContent: analysis.analysis_content,
-                    contentType: typeof analysis.analysis_content
-                  };
-                  
-                  // Only add string operations if it's a string
-                  if (typeof analysis.analysis_content === 'string') {
-                    contentToLog.firstFewChars = analysis.analysis_content.substring(0, 20);
-                    contentToLog.charCodes = [...analysis.analysis_content.substring(0, 10)].map(c => c.charCodeAt(0));
-                  }
-                  
-                  console.log(`Problematic JSON for Analysis ID ${analysis.id}:`, contentToLog);
-                  
-                  // Try to clean the JSON content by removing BOM or other problematic characters
-                  const cleanedContent = analysis.analysis_content
-                    .replace(/^\uFEFF/, '')  // Remove BOM if present
-                    .replace(/^\u00EF\u00BB\u00BF/, '') // Remove UTF-8 BOM
-                    .trim();
-                    
-                  if (cleanedContent !== analysis.analysis_content) {
-                    console.log(`Cleaned content for Analysis ID ${analysis.id}:`, {
-                      cleanedContent: cleanedContent.substring(0, 20),
-                      charCodes: [...cleanedContent.substring(0, 10)].map(c => c.charCodeAt(0))
-                    });
-                    
-                    // Try parsing the cleaned content
-                    try {
-                      const parsedContent = JSON.parse(cleanedContent);
-                      console.log(`Successfully parsed cleaned JSON for Analysis ID ${analysis.id}`);
-                      return {
-                        id: parsedContent.strategy?.id || Date.now(),
-                        name: parsedContent.strategy?.name || "Recovered Strategy",
-                        description: parsedContent.strategy?.description || "Recovered from corrupted data",
-                        type: parsedContent.strategy?.type || "Other",
-                        status: "Draft",
-                        progress: 0,
-                        targetAudience: parsedContent.strategy?.targetAudience || "Unknown",
-                        channels: parsedContent.strategy?.channels || ["Other"],
-                        metrics: {
-                          reach: "TBD",
-                          engagement: "TBD",
-                          conversion: "TBD",
-                          revenue: "TBD"
-                        },
-                        dbId: analysis.id,
-                        dataSource: {
-                          id: analysis.data_id,
-                          name: "Unknown dataset"
-                        }
-                      };
-                    } catch (cleanError) {
-                      console.error(`Could not parse cleaned content for Analysis ID ${analysis.id}: ${cleanError instanceof Error ? cleanError.message : 'Unknown error'}`);
-                    }
-                  }
-                  
-                  // Skip this problematic item
-                  return null;
-                }
-                
-                // Use our safe parser for nested JSON as well
-                let content;
-                try {
-                  content = JSON.parse(analysis.analysis_content);
-                } catch (error) {
-                  console.error(`Analysis ID ${analysis.id} has invalid JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
-                  
-                  // Skip this invalid item
-                  return null;
-                }
-                
-                // Skip if content is empty 
-                if (!content || Object.keys(content).length === 0) {
-                  console.log(`Analysis ID ${analysis.id} has empty content object, skipping`);
-                  return null;
-                }
-                
-                // Check if strategy is present in content
-                if (!content.strategy) {
-                  console.log(`Analysis ID ${analysis.id} has no strategy in content, skipping`);
-                  return null;
-                }
-                
-                // Create a safe copy of the strategy with all required fields
-                if (typeof content.strategy !== 'object' || content.strategy === null) {
-                  console.log(`Analysis ID ${analysis.id} has invalid strategy format, skipping`);
-                  return null;
-                }
-                
-                const strategy = content.strategy;
-                
-                // Ensure strategy has minimum required fields
-                if (!strategy.id || !strategy.name || !strategy.type) {
-                  console.log(`Analysis ID ${analysis.id} has incomplete strategy data, skipping`);
-                  return null;
-                }
-                
-                return {
-                  ...strategy,
-                  dbId: analysis.id, // Store the database ID for future updates
-                  dataSource: {
-                    id: analysis.data_id,
-                    name: strategy.dataSource?.name || 'Unknown dataset'
-                  }
-                };
-              } catch (e) {
-                console.error('Error parsing saved strategy:', e);
-                return null;
-              }
-            })
-            .filter((item): item is Strategy => item !== null); // Remove any null entries and provide type guard
-          
-          return savedStrategies;
-        }
-      } else {
-        console.error("Failed to fetch saved strategies:", response.status, response.statusText);
-      }
-      return [];
-    } catch (error) {
-      console.error("Error fetching saved strategies:", error);
-      return [];
-    }
-  };
-
   const generateStrategies = async () => {
     if (!selectedDataset) {
       setAnalysisError("Please select a dataset first");
@@ -599,8 +376,10 @@ export default function StrategiesPage() {
     setUsingFallback(false); // Reset fallback flag
     
     try {
-      // First, fetch all saved strategies to ensure we don't lose them
+      // First, fetch all saved strategies to ensure we don't lose them and keep them
       const savedStrategiesList = await fetchAllSavedStrategies();
+      // Keep existing AI strategies
+      const existingAiStrategies = [...aiStrategies];
       
       const token = localStorage.getItem('token');
       if (!token) {
@@ -696,7 +475,7 @@ export default function StrategiesPage() {
           console.log("Received strategies:", data.strategies);
           
           // Transform the AI strategies to match our UI format
-          const formattedStrategies = data.strategies.map((strategy, index) => {
+          const formattedStrategies = data.strategies.map((strategy: any, index: number) => {
             const formattedStrategy = {
               id: Date.now() + index,
               name: strategy.name || `Strategy ${index + 1}`,
@@ -730,7 +509,7 @@ export default function StrategiesPage() {
             console.log(`Auto-saving ${formattedStrategies.length} AI-generated strategies...`);
             
             // Save each strategy in parallel
-            await Promise.all(formattedStrategies.map(async (strategy) => {
+            await Promise.all(formattedStrategies.map(async (strategy: Strategy) => {
               // Prepare strategy data for saving
               const strategyData = {
                 dataId: selectedDataset,
@@ -782,9 +561,8 @@ export default function StrategiesPage() {
             // Continue execution - don't block the UI for auto-save errors
           }
           
-          // Set AI strategies and switch to AI tab
-          setAiStrategies(formattedStrategies);
-          setActiveTab("ai");
+                                // Add new strategies to existing ones without removing previous ones
+          setAiStrategies([...existingAiStrategies, ...formattedStrategies]);
           
           // Show success notification
           alert(`Successfully generated ${formattedStrategies.length} marketing strategies!`);
@@ -869,11 +647,12 @@ export default function StrategiesPage() {
             });
           }
         }
-      } catch (fetchError) {
-        if (fetchError.name === 'AbortError') {
+      } catch (fetchError: unknown) {
+        if ((fetchError as Error).name === 'AbortError') {
           setAnalysisError("Request timed out. The server took too long to respond.");
         } else {
-          setAnalysisError(`Network error: ${fetchError.message}`);
+          const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
+          setAnalysisError(`Network error: ${errorMessage}`);
         }
         console.error("Fetch error:", fetchError);
         
@@ -900,9 +679,10 @@ export default function StrategiesPage() {
           });
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error generating strategies:", error);
-      setAnalysisError(`Error: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setAnalysisError(`Error: ${errorMessage}`);
       setDefaultStrategies(null);
     } finally {
       setIsAnalyzing(false);
@@ -911,9 +691,12 @@ export default function StrategiesPage() {
   
   // Set default strategies when API fails
   const setDefaultStrategies = (selectedData: any) => {
+    // Generate a base timestamp to ensure uniqueness
+    const baseTimestamp = Date.now();
+    
     const defaultStrategies: Strategy[] = [
       {
-        id: Date.now(),
+        id: `${baseTimestamp}-0-${Math.random().toString(36).substring(2, 9)}`,
         name: "Customer Retention Campaign",
         description: "Re-engage inactive customers and increase repeat purchases.",
         type: "Retention",
@@ -938,7 +721,7 @@ export default function StrategiesPage() {
         } : undefined
       },
       {
-        id: Date.now() + 1,
+        id: `${baseTimestamp}-1-${Math.random().toString(36).substring(2, 9)}`,
         name: "New Customer Acquisition",
         description: "Expand customer base and increase market share.",
         type: "Launch",
@@ -963,7 +746,7 @@ export default function StrategiesPage() {
         } : undefined
       },
       {
-        id: Date.now() + 2,
+        id: `${baseTimestamp}-2-${Math.random().toString(36).substring(2, 9)}`,
         name: "Premium Product Upsell",
         description: "Increase average order value and introduce customers to premium offerings.",
         type: "Upsell",
@@ -989,9 +772,178 @@ export default function StrategiesPage() {
       }
     ];
     
-    setAiStrategies(defaultStrategies);
-    setActiveTab("ai");
+    // Keep existing strategies and add the new default ones
+    setAiStrategies(prevStrategies => [...prevStrategies, ...defaultStrategies]);
     setUsingFallback(true);
+    
+    // Auto-save default strategies to database
+    const token = localStorage.getItem('token');
+    if (token && selectedData) {
+      // Auto-save each strategy
+      defaultStrategies.forEach(async (strategy) => {
+        // Prepare strategy data for saving
+        const strategyData = {
+          dataId: selectedData.id,
+          analysisType: 'strategy_draft',
+          analysisContent: JSON.stringify({
+            strategy: {
+              ...strategy,
+              aiGenerated: true,
+              status: "Draft",
+              progress: 0,
+              savedAt: new Date().toISOString()
+            }
+          })
+        };
+        
+        try {
+          // Save to database
+          const response = await fetch('http://localhost:5000/api/analysis', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(strategyData)
+          });
+          
+          if (response.ok) {
+            console.log(`Default strategy "${strategy.name}" saved to database`);
+          }
+        } catch (error) {
+          console.error(`Error auto-saving default strategy:`, error);
+        }
+      });
+    }
+  };
+
+  // Fetch all saved strategies before generating new ones
+  const fetchAllSavedStrategies = async (): Promise<Strategy[]> => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return [];
+      
+      const response = await fetch('http://localhost:5000/api/analysis/type/strategy_draft', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      // Log response status and headers
+      console.log("fetchAllSavedStrategies response status:", response.status, response.statusText);
+      const headers: Record<string, string> = {};
+      response.headers.forEach((value, key) => {
+        headers[key] = value;
+      });
+      console.log("fetchAllSavedStrategies response headers:", headers);
+      
+      if (response.ok) {
+        // Get the raw text response
+        const responseText = await response.text();
+        
+        // Try to parse the response as JSON using our safe parser
+        const savedAnalysesResult = safeJsonParse(responseText, "fetchAllSavedStrategies");
+        
+        if (savedAnalysesResult && Array.isArray(savedAnalysesResult) && savedAnalysesResult.length > 0) {
+          // Extract strategies from analysis content
+          const savedStrategies = savedAnalysesResult
+            .map((analysis: any) => {
+              try {
+                // Skip if analysis_content is empty or undefined
+                if (!analysis.analysis_content) {
+                  console.log(`Analysis ID ${analysis.id} has empty content, skipping`);
+                  return null;
+                }
+                
+                // Skip if it's an empty object
+                if (analysis.analysis_content === '{}') {
+                  console.log(`Analysis ID ${analysis.id} has empty object content {}, skipping`);
+                  return null;
+                }
+                
+                // First, ensure analysis_content is a string
+                if (typeof analysis.analysis_content !== 'string') {
+                  // If it's already an object, we can try to use it directly
+                  if (typeof analysis.analysis_content === 'object' && analysis.analysis_content !== null) {
+                    console.log(`Analysis ID ${analysis.id} already has object content, using directly`);
+                    const directContent = analysis.analysis_content;
+                    
+                    // Check if this already has a strategy property
+                    if (directContent.strategy) {
+                      return {
+                        ...directContent.strategy,
+                        dbId: analysis.id,
+                        dataSource: {
+                          id: analysis.data_id,
+                          name: directContent.strategy.dataSource?.name || 'Unknown dataset'
+                        }
+                      };
+                    }
+                  }
+                  
+                  return null;
+                }
+                
+                // Use our safe parser for nested JSON
+                let content;
+                try {
+                  content = JSON.parse(analysis.analysis_content);
+                } catch (error) {
+                  console.error(`Analysis ID ${analysis.id} has invalid JSON:`, error);
+                  return null;
+                }
+                
+                // Skip if content is empty 
+                if (!content || Object.keys(content).length === 0) {
+                  console.log(`Analysis ID ${analysis.id} has empty content object, skipping`);
+                  return null;
+                }
+                
+                // Check if strategy is present in content
+                if (!content.strategy) {
+                  console.log(`Analysis ID ${analysis.id} has no strategy in content, skipping`);
+                  return null;
+                }
+                
+                // Create a safe copy of the strategy with all required fields
+                if (typeof content.strategy !== 'object' || content.strategy === null) {
+                  console.log(`Analysis ID ${analysis.id} has invalid strategy format, skipping`);
+                  return null;
+                }
+                
+                const strategy = content.strategy;
+                
+                // Ensure strategy has minimum required fields
+                if (!strategy.id || !strategy.name || !strategy.type) {
+                  console.log(`Analysis ID ${analysis.id} has incomplete strategy data, skipping`);
+                  return null;
+                }
+                
+                return {
+                  ...strategy,
+                  dbId: analysis.id, // Store the database ID for future updates
+                  dataSource: {
+                    id: analysis.data_id,
+                    name: strategy.dataSource?.name || 'Unknown dataset'
+                  }
+                };
+              } catch (e) {
+                console.error('Error parsing saved strategy:', e);
+                return null;
+              }
+            })
+            .filter((item): item is Strategy => item !== null); // Remove any null entries and provide type guard
+          
+          return savedStrategies.filter(s => s.aiGenerated === true); // Only return AI-generated strategies
+        }
+      } else {
+        console.error("Failed to fetch saved strategies:", response.status, response.statusText);
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching saved strategies:", error);
+      return [];
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -1020,36 +972,99 @@ export default function StrategiesPage() {
     }
   }
 
-  const displayStrategies = activeTab === "existing" ? strategies : aiStrategies;
+  const displayStrategies = aiStrategies;
 
   // Handle deleting a strategy
-  const handleDeleteStrategy = (strategy: any) => {
+  const handleDeleteStrategy = (strategy: Strategy) => {
     setStrategyToDelete(strategy);
     setIsDeleteDialogOpen(true);
   };
 
-  // Confirm strategy deletion
-  const confirmDeleteStrategy = () => {
+  // Confirm strategy deletion - completely removes strategy from all data sources
+  const confirmDeleteStrategy = async () => {
     if (!strategyToDelete) return;
     
-    if (activeTab === "existing") {
-      setStrategies(strategies.filter(s => s.id !== strategyToDelete.id));
-    } else {
-      setAiStrategies(aiStrategies.filter(s => s.id !== strategyToDelete.id));
+    try {
+      // If the strategy has a dbId, delete it from the backend
+      if (strategyToDelete.dbId) {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('Authentication required. Please login again.');
+          return;
+        }
+        
+        console.log(`Deleting strategy with DB ID: ${strategyToDelete.dbId}`);
+        
+        const response = await fetch(`http://localhost:5000/api/analysis/${strategyToDelete.dbId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Error deleting strategy from backend:', errorText);
+          throw new Error(`Failed to delete strategy: ${response.status} ${response.statusText}`);
+        }
+        
+        console.log('Strategy successfully deleted from backend');
+      } else {
+        console.log('Strategy has no dbId, only removing from local state');
+      }
+      
+      // Update only the AI strategies array
+      setAiStrategies(aiStrategies.filter(s => {
+        // Remove by ID match
+        if (s.id === strategyToDelete.id) return false;
+        // Also remove by dbId match if it exists
+        if (strategyToDelete.dbId && s.dbId === strategyToDelete.dbId) return false;
+        return true;
+      }));
+      
+      // Also remove from localStorage for AI strategies
+      try {
+        const localStorageKey = 'aiMarketingStrategies';
+        const storedStrategies = localStorage.getItem(localStorageKey);
+        
+        if (storedStrategies) {
+          const parsedStrategies = JSON.parse(storedStrategies);
+          // Filter out the deleted strategy
+          const updatedStrategies = parsedStrategies.filter((s: any) => 
+            s.id !== strategyToDelete.id && 
+            (!strategyToDelete.dbId || s.dbId !== strategyToDelete.dbId)
+          );
+          
+          // Save back to localStorage
+          localStorage.setItem(localStorageKey, JSON.stringify(updatedStrategies));
+          console.log('Strategy removed from AI strategies localStorage');
+        }
+      } catch (localStorageError) {
+        console.error('Error updating AI strategies localStorage:', localStorageError);
+      }
+      
+      setIsDeleteDialogOpen(false);
+      setStrategyToDelete(null);
+      
+      // Show confirmation
+      alert(`Strategy "${strategyToDelete.name}" has been permanently deleted`);
+    } catch (error) {
+      console.error('Error during strategy deletion:', error);
+      alert(`Error deleting strategy: ${error instanceof Error ? error.message : String(error)}`);
     }
-    
-    setIsDeleteDialogOpen(false);
-    setStrategyToDelete(null);
   };
 
-  // Handle saving AI strategy as draft
-  const handleSaveAsDraft = async (strategy: any) => {
+  // Handle saving AI strategy as draft - keeps in AI strategies tab
+  const handleSaveAsDraft = async (strategy: Strategy) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         alert('Authentication required. Please login again.');
         return;
       }
+      
+      // Generate a unique ID using UUID pattern to avoid duplicates
+      const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
       
       // Prepare strategy data for saving
       const strategyData = {
@@ -1058,6 +1073,7 @@ export default function StrategiesPage() {
         analysisContent: JSON.stringify({
           strategy: {
             ...strategy,
+            aiGenerated: true, // Ensure it stays in the AI tab
             status: "Draft",
             progress: 0,
             savedAt: new Date().toISOString(),
@@ -1073,14 +1089,23 @@ export default function StrategiesPage() {
       
       console.log("Sending strategy data:", JSON.stringify(strategyData).substring(0, 200) + "...");
       
+      // Check if we're updating an existing strategy or creating a new one
+      const isUpdate = strategy.dbId ? true : false;
+      const url = isUpdate 
+        ? `http://localhost:5000/api/analysis/${strategy.dbId}` 
+        : 'http://localhost:5000/api/analysis';
+      const method = isUpdate ? 'PUT' : 'POST';
+      
       // Save to database
-      const response = await fetch('http://localhost:5000/api/analysis', {
-        method: 'POST',
+      const response = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(strategyData)
+        body: JSON.stringify(isUpdate ? {
+          analysisContent: strategyData.analysisContent
+        } : strategyData)
       });
       
       // Log response headers for debugging
@@ -1099,13 +1124,14 @@ export default function StrategiesPage() {
       const savedData = safeJsonParse(responseText, "handleSaveAsDraft");
       
       if (response.ok) {
-        // Add the AI strategy to the existing strategies list with status "Draft"
+        // Create the updated strategy
         const draftStrategy = {
           ...strategy,
-          id: Date.now(), // Generate a new ID
-          dbId: savedData?.id || Date.now(), // Store the database ID or use timestamp as fallback
+          id: strategy.id || uniqueId, // Keep existing ID or create new one
+          dbId: isUpdate ? strategy.dbId : savedData?.id, // Store the database ID
           status: "Draft",
           progress: 0,
+          aiGenerated: true, // Ensure it stays flagged as AI-generated
           metrics: {
             reach: "TBD",
             engagement: "TBD",
@@ -1114,17 +1140,36 @@ export default function StrategiesPage() {
           }
         };
         
-        setStrategies([...strategies, draftStrategy]);
+        // Update the strategy in the AI strategies list
+        const updatedAiStrategies = aiStrategies.map(s => 
+          s.id === strategy.id ? draftStrategy : s
+        );
+        
+        // If the strategy wasn't found in the list, add it
+        if (!updatedAiStrategies.some(s => s.id === strategy.id)) {
+          updatedAiStrategies.push(draftStrategy);
+        }
+        
+        setAiStrategies(updatedAiStrategies);
+        
+        // Save to localStorage
+        try {
+          const localStorageKey = 'aiMarketingStrategies';
+          localStorage.setItem(localStorageKey, JSON.stringify(updatedAiStrategies));
+        } catch (error) {
+          console.error('Error saving AI strategies to localStorage:', error);
+        }
         
         // Show confirmation
-        alert(`Strategy "${strategy.name}" saved as draft`);
+        alert(`Strategy "${strategy.name}" ${isUpdate ? 'updated' : 'saved'} as draft`);
       } else {
         const errorMessage = savedData?.message || responseText || 'Failed to save strategy';
         throw new Error(errorMessage);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving strategy as draft:', error);
-      alert(`Error saving strategy: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      alert(`Error saving strategy: ${errorMessage}`);
     }
   };
 
@@ -1141,15 +1186,10 @@ export default function StrategiesPage() {
     
     const updatedStrategy: Strategy = { ...strategyToEdit, ...editedStrategy };
     
-    if (activeTab === "existing") {
-      setStrategies(strategies.map(s => 
-        s.id === strategyToEdit.id ? updatedStrategy : s
-      ));
-    } else {
-      setAiStrategies(aiStrategies.map(s => 
-        s.id === strategyToEdit.id ? updatedStrategy : s
-      ));
-    }
+    // Update only AI strategies
+    setAiStrategies(aiStrategies.map((s: Strategy) => 
+      s.id === strategyToEdit.id ? updatedStrategy : s
+    ));
     
     setIsEditDialogOpen(false);
     setStrategyToEdit(null);
@@ -1157,7 +1197,7 @@ export default function StrategiesPage() {
   };
 
   // Handle implementing a strategy
-  const handleImplementStrategy = (strategy: any) => {
+  const handleImplementStrategy = (strategy: Strategy) => {
     setStrategyToImplement(strategy);
     setIsImplementDialogOpen(true);
   };
@@ -1166,21 +1206,50 @@ export default function StrategiesPage() {
   const confirmImplementStrategy = () => {
     if (!strategyToImplement) return;
     
-    // If it's an AI strategy, add it to existing strategies
-    if (activeTab === "ai") {
-      const implementedStrategy = {
-        ...strategyToImplement,
-        id: Date.now(), // Generate a new ID
-        status: "Active",
-        progress: 10, // Start with 10% progress
-      };
-      
-      setStrategies([...strategies, implementedStrategy]);
-    } else {
-      // Update the status of existing strategy
-      setStrategies(strategies.map(s => 
-        s.id === strategyToImplement.id ? {...s, status: "Active", progress: Math.max(s.progress, 10)} : s
-      ));
+    // Update the AI strategy status
+    const updatedAiStrategies = aiStrategies.map((s: Strategy) => 
+      s.id === strategyToImplement.id ? {...s, status: "Active", progress: 10} : s
+    );
+    
+    setAiStrategies(updatedAiStrategies);
+    
+    // Save to localStorage
+    localStorage.setItem('aiMarketingStrategies', JSON.stringify(updatedAiStrategies));
+    
+    // If the strategy has a dbId, update it in the database
+    if (strategyToImplement.dbId) {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          // Update the status in the database
+          fetch(`http://localhost:5000/api/analysis/${strategyToImplement.dbId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              analysisContent: JSON.stringify({
+                strategy: {
+                  ...strategyToImplement,
+                  status: "Active",
+                  progress: 10
+                }
+              })
+            })
+          }).then(response => {
+            if (!response.ok) {
+              console.error('Error updating strategy in database:', response.statusText);
+            } else {
+              console.log('Strategy updated in database');
+            }
+          }).catch(error => {
+            console.error('Error updating strategy:', error);
+          });
+        }
+      } catch (error) {
+        console.error('Error updating strategy in database:', error);
+      }
     }
     
     setIsImplementDialogOpen(false);
@@ -1325,7 +1394,7 @@ export default function StrategiesPage() {
 
       <div className="p-6">
         {/* Strategy Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -1334,35 +1403,9 @@ export default function StrategiesPage() {
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {strategies.length + aiStrategies.length}
+                    {aiStrategies.length}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">Total Strategies</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                  <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">₹2.5L</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Total Revenue</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                  <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">7.1K</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Total Reach</div>
                 </div>
               </div>
             </CardContent>
@@ -1375,48 +1418,64 @@ export default function StrategiesPage() {
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                    {aiStrategies.length}
+                    {aiStrategies.filter(s => s.status === "Active").length}
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">AI Strategies</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Active Strategies</div>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <Tabs defaultValue="existing" value={activeTab} onValueChange={setActiveTab} className="max-w-6xl mx-auto">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="existing">Existing Strategies</TabsTrigger>
-            <TabsTrigger value="ai" id="ai-tab">
-              {usingFallback ? "AI Strategies (Fallback)" : "Gemini 1.5 Flash Strategies"}
-            </TabsTrigger>
-          </TabsList>
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold mb-2">Gemini 1.5 Flash Strategies</h2>
+            <p className="text-gray-600 dark:text-gray-400">AI-powered strategic marketing recommendations based on your data</p>
+          </div>
           
-          <TabsContent value="existing" className="mt-6">
+          {aiStrategies.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-4">
+                <BrainCircuit className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              </div>
+              <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">No AI Strategies Yet</h3>
+              <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-6">
+                Generate AI-powered marketing strategies by analyzing your customer data with Gemini 1.5 Flash.
+              </p>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button>
+                    <BrainCircuit className="h-4 w-4 mr-2" />
+                    Generate Strategies
+                  </Button>
+                </DialogTrigger>
+                {/* Dialog content is defined above */}
+              </Dialog>
+            </div>
+          ) : (
             <div className="grid gap-6">
-              {strategies.map((strategy) => (
-                <Card key={strategy.id}>
-                  <CardHeader>
+              {aiStrategies.map((strategy) => (
+                <Card key={strategy.id} className="overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 pb-3">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2">
                           <CardTitle className="text-xl">{strategy.name}</CardTitle>
-                          <Badge className={getTypeColor(strategy.type)}>{strategy.type}</Badge>
-                          <Badge className={getStatusColor(strategy.status)}>{strategy.status}</Badge>
+                          <Badge className="bg-blue-500 hover:bg-blue-600">
+                            {usingFallback ? "AI Generated (Fallback)" : "Gemini 1.5 Flash"}
+                          </Badge>
+                          <Badge variant={strategy.status === "Active" ? "default" : "secondary"}>{strategy.status}</Badge>
                         </div>
                         <CardDescription className="mt-1">{strategy.description}</CardDescription>
+                        {strategy.dataSource && (
+                          <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                            Based on dataset: {strategy.dataSource.name}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">{strategy.progress}%</span>
-                      </div>
-                      <Progress value={strategy.progress} className="h-2" />
-                    </div>
-
+                  <CardContent className="space-y-6 pt-4">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
                         <Users className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
@@ -1425,25 +1484,42 @@ export default function StrategiesPage() {
                       </div>
                       <div className="text-center p-4 bg-green-50 dark:bg-green-900/30 rounded-lg">
                         <Calendar className="h-6 w-6 text-green-600 dark:text-green-400 mx-auto mb-2" />
-                        <div className="text-sm font-medium text-green-700 dark:text-green-300">Channels</div>
-                        <div className="text-xs text-green-600 dark:text-green-300 mt-1">{strategy.channels.join(", ")}</div>
+                        <div className="text-sm font-medium text-green-700 dark:text-green-300">Timeline</div>
+                        <div className="text-sm text-green-600 dark:text-green-400">{strategy.timeline || "3-6 months"}</div>
                       </div>
                       <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
-                        <TrendingUp className="h-6 w-6 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
-                        <div className="text-sm font-medium text-purple-700 dark:text-purple-300">Metrics</div>
-                        <div className="text-xs text-purple-600 dark:text-purple-300 mt-1">
-                          {Object.entries(strategy.metrics).map(([key, value]) => (
-                            <span key={key} className="inline-block mr-2">
-                              {key.charAt(0).toUpperCase() + key.slice(1)}: {value}
-                            </span>
-                          ))}
-                        </div>
+                        <Target className="h-6 w-6 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
+                        <div className="text-sm font-medium text-purple-700 dark:text-purple-300">Channels</div>
+                        <div className="text-xs text-purple-600 dark:text-purple-300">{strategy.channels.join(", ")}</div>
+                      </div>
+                      <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/30 rounded-lg">
+                        <TrendingUp className="h-6 w-6 text-orange-600 dark:text-orange-400 mx-auto mb-2" />
+                        <div className="text-sm font-medium text-orange-700 dark:text-orange-300">Budget</div>
+                        <div className="text-xs text-orange-600 dark:text-orange-300">{strategy.budget || "Not specified"}</div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 dark:text-white">Objectives</h4>
+                      <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border dark:border-gray-700">
+                        <div className="text-sm text-gray-700 dark:text-gray-300">{strategy.objectives}</div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-3 dark:text-white">Expected Outcomes</h4>
+                      <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border dark:border-gray-700">
+                        <div className="text-sm text-gray-700 dark:text-gray-300">{strategy.outcomes}</div>
                       </div>
                     </div>
 
                     <div className="flex gap-2">
-                      <Button variant="outline" className="flex-1">
-                        View Analytics
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => handleSaveAsDraft(strategy)}
+                      >
+                        {strategy.dbId ? 'Update Draft' : 'Save as Draft'}
                       </Button>
                       <Button 
                         variant="outline" 
@@ -1456,7 +1532,7 @@ export default function StrategiesPage() {
                         className="flex-1"
                         onClick={() => handleImplementStrategy(strategy)}
                       >
-                        Implement
+                        Implement Strategy
                       </Button>
                       <Button 
                         variant="destructive" 
@@ -1470,125 +1546,8 @@ export default function StrategiesPage() {
                 </Card>
               ))}
             </div>
-          </TabsContent>
-          
-          <TabsContent value="ai" className="mt-6">
-            {aiStrategies.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-4">
-                  <BrainCircuit className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                </div>
-                <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">No AI Strategies Yet</h3>
-                <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-6">
-                  Generate AI-powered marketing strategies by analyzing your customer data with Gemini 1.5 Flash.
-                </p>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <BrainCircuit className="h-4 w-4 mr-2" />
-                      Generate Strategies
-                    </Button>
-                  </DialogTrigger>
-                  {/* Dialog content is defined above */}
-                </Dialog>
-              </div>
-            ) : (
-              <div className="grid gap-6">
-                {aiStrategies.map((strategy) => (
-                  <Card key={strategy.id} className="overflow-hidden">
-                    <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 pb-3">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <CardTitle className="text-xl">{strategy.name}</CardTitle>
-                            <Badge className="bg-blue-500 hover:bg-blue-600">
-                              {usingFallback ? "AI Generated (Fallback)" : "Gemini 1.5 Flash"}
-                            </Badge>
-                            <Badge variant={strategy.status === "Active" ? "default" : "secondary"}>{strategy.status}</Badge>
-                          </div>
-                          <CardDescription className="mt-1">{strategy.description}</CardDescription>
-                          {strategy.dataSource && (
-                            <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                              Based on dataset: {strategy.dataSource.name}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-6 pt-4">
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
-                          <Users className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
-                          <div className="text-sm font-medium text-blue-700 dark:text-blue-300">Target Audience</div>
-                          <div className="text-xs text-blue-600 dark:text-blue-300 mt-1">{strategy.targetAudience}</div>
-                        </div>
-                        <div className="text-center p-4 bg-green-50 dark:bg-green-900/30 rounded-lg">
-                          <Calendar className="h-6 w-6 text-green-600 dark:text-green-400 mx-auto mb-2" />
-                          <div className="text-sm font-medium text-green-700 dark:text-green-300">Timeline</div>
-                          <div className="text-sm text-green-600 dark:text-green-400">{strategy.timeline || "3-6 months"}</div>
-                        </div>
-                        <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
-                          <Target className="h-6 w-6 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
-                          <div className="text-sm font-medium text-purple-700 dark:text-purple-300">Channels</div>
-                          <div className="text-xs text-purple-600 dark:text-purple-300">{strategy.channels.join(", ")}</div>
-                        </div>
-                        <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/30 rounded-lg">
-                          <TrendingUp className="h-6 w-6 text-orange-600 dark:text-orange-400 mx-auto mb-2" />
-                          <div className="text-sm font-medium text-orange-700 dark:text-orange-300">Budget</div>
-                          <div className="text-xs text-orange-600 dark:text-orange-300">{strategy.budget || "Not specified"}</div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <h4 className="font-semibold mb-3 dark:text-white">Objectives</h4>
-                        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border dark:border-gray-700">
-                          <div className="text-sm text-gray-700 dark:text-gray-300">{strategy.objectives}</div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <h4 className="font-semibold mb-3 dark:text-white">Expected Outcomes</h4>
-                        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border dark:border-gray-700">
-                          <div className="text-sm text-gray-700 dark:text-gray-300">{strategy.outcomes}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          className="flex-1"
-                          onClick={() => handleSaveAsDraft(strategy)}
-                        >
-                          {strategy.dbId ? 'Update Draft' : 'Save as Draft'}
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          className="flex-1"
-                          onClick={() => handleEditStrategy(strategy)}
-                        >
-                          Edit Strategy
-                        </Button>
-                        <Button 
-                          className="flex-1"
-                          onClick={() => handleImplementStrategy(strategy)}
-                        >
-                          Implement Strategy
-                        </Button>
-                        <Button 
-                          variant="destructive" 
-                          size="icon"
-                          onClick={() => handleDeleteStrategy(strategy)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
       </div>
       
       {/* Delete Strategy Dialog */}

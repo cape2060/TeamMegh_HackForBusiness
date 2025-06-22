@@ -166,10 +166,12 @@ export default function MarketingPage() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1">
-                    View Analytics
-                  </Button>
-                  <Button variant="outline" className="flex-1">
+                  <Link href={`/dashboard/view-data?id=${plan.id}&type=marketing`} passHref>
+                    <Button variant="outline" className="flex-1">
+                      View Analytics
+                    </Button>
+                  </Link>
+                  <Button variant="outline" className="flex-1" onClick={() => setEditingPlan(plan.id)}>
                     Edit Strategy
                   </Button>
                   <Button className="flex-1">Launch Campaign</Button>

@@ -1,0 +1,21 @@
+product_niche,product_id,product_details,exported_date,market_share,relative_market_share,market_growth,total_qty_sold,total_sales
+Handcrafted,SHOE001,Handcrafted Shoe Model 1,Jan-29,8.91,56.87,-3.86,2524,209022.73
+Professional Workwear,SHOE002,Professional Workwear Shoe Model 2,Jan-07,2.12,13.55,12.64,1384,49787.88
+Orthopedic,SHOE003,Orthopedic Shoe Model 3,Mar-12,1.72,10.96,24.45,659,40290.44
+Professional Workwear,SHOE004,Professional Workwear Shoe Model 4,Mar-04,10.3,65.74,13.36,3585,241604.5
+Professional Workwear,SHOE005,Professional Workwear Shoe Model 5,Feb-27,0.22,1.43,6.53,221,5241.24
+Athletic,SHOE006,Athletic Shoe Model 6,Feb-05,7.31,46.67,11.17,2500,171508.97
+Orthopedic,SHOE007,Orthopedic Shoe Model 7,Jan-27,1.36,8.67,-2.06,947,31858.91
+Orthopedic,SHOE008,Orthopedic Shoe Model 8,May-20,3.33,21.29,-6.08,3104,78233.61
+Orthopedic,SHOE009,Orthopedic Shoe Model 9,Jan-23,15.66,100.0,10.42,3832,367530.35
+Professional Workwear,SHOE010,Professional Workwear Shoe Model 10,Apr-19,2.79,17.83,1.23,674,65546.88
+Handcrafted,SHOE011,Handcrafted Shoe Model 11,Jan-09,4.63,29.53,-4.43,1282,108549.23
+Orthopedic,SHOE012,Orthopedic Shoe Model 12,Jan-08,5.22,33.3,-1.16,2758,122369.98
+Luxury Streetwear,SHOE013,Luxury Streetwear Shoe Model 13,Jan-24,4.69,29.92,-2.91,3953,109947.83
+Professional Workwear,SHOE014,Professional Workwear Shoe Model 14,Feb-25,7.16,45.69,5.94,2247,167937.73
+Athletic,SHOE015,Athletic Shoe Model 15,Mar-01,8.82,56.29,9.07,3747,206880.11
+Handcrafted,SHOE016,Handcrafted Shoe Model 16,May-10,3.74,23.87,11.21,2947,87711.73
+Luxury Streetwear,SHOE017,Luxury Streetwear Shoe Model 17,Jan-07,2.99,19.06,11.26,1175,70046.63
+Luxury Streetwear,SHOE018,Luxury Streetwear Shoe Model 18,May-24,1.95,12.42,10.28,2006,45638.67
+Athletic,SHOE019,Athletic Shoe Model 19,Feb-20,1.54,9.82,3.55,389,36078.05
+Handcrafted,SHOE020,Handcrafted Shoe Model 20,May-20,5.56,35.49,0.64,3205,130451.19

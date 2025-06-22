@@ -10,7 +10,8 @@ const {
   deleteAnalysis,
   generateMarketingStrategies,
   generateProductPrototype,
-  analyzeMarketResearch
+  analyzeMarketResearch,
+  processResearchData
 } = require('../controllers/analysisController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -62,5 +63,8 @@ router.post('/prototype', generateProductPrototype);
 
 // Analyze market research data
 router.post('/market_research', analyzeMarketResearch);
+
+// Process research data with Python scripts
+router.post('/research_analysis', processResearchData);
 
 module.exports = router;

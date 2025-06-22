@@ -30,6 +30,15 @@ export default function SettingsPage() {
     dataSharing: true
   })
 
+  // Add password change state
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  })
+  const [passwordError, setPasswordError] = useState("")
+  const [passwordSuccess, setPasswordSuccess] = useState("")
+
   useEffect(() => {
     const loadUserData = async () => {
       try {
@@ -117,6 +126,11 @@ export default function SettingsPage() {
     }
     
     setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  // Add password change handler
+  const handlePasswordChange = (field: string, value: string) => {
+    setPasswordData(prev => ({ ...prev, [field]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -242,6 +256,67 @@ export default function SettingsPage() {
     } catch (err: any) {
       console.error("Error saving settings:", err)
       setError(err.message || "Failed to save settings")
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  // Add password update submit handler
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setPasswordError("")
+    setPasswordSuccess("")
+    setIsSaving(true)
+
+    // Validate passwords match
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError("New passwords do not match")
+      setIsSaving(false)
+      return
+    }
+
+    // Validate password length
+    if (passwordData.newPassword.length < 6) {
+      setPasswordError("Password must be at least 6 characters long")
+      setIsSaving(false)
+      return
+    }
+
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        throw new Error("Authentication required")
+      }
+
+      // Call API to update password
+      const response = await fetch('http://localhost:5000/api/users/password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Failed to update password")
+      }
+
+      // Reset password fields
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+      })
+      
+      setPasswordSuccess("Password updated successfully!")
+    } catch (err: any) {
+      console.error("Error updating password:", err)
+      setPasswordError(err.message || "Failed to update password")
     } finally {
       setIsSaving(false)
     }
@@ -413,6 +488,70 @@ export default function SettingsPage() {
                     onCheckedChange={(checked) => handleChange('dataSharing', checked)}
                   />
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Password Settings */}
+            <Card className="mb-6 dark:bg-gray-800 dark:border-gray-700">
+              <CardHeader>
+                <CardTitle className="dark:text-white">Change Password</CardTitle>
+                <CardDescription className="dark:text-gray-400">Update your account password</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {passwordError && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{passwordError}</AlertDescription>
+                  </Alert>
+                )}
+                
+                {passwordSuccess && (
+                  <Alert className="mb-4 bg-green-50 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-900">
+                    <AlertDescription>{passwordSuccess}</AlertDescription>
+                  </Alert>
+                )}
+                
+                <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="currentPassword" className="dark:text-gray-300">Current Password</Label>
+                    <Input 
+                      id="currentPassword" 
+                      type="password" 
+                      value={passwordData.currentPassword}
+                      onChange={(e) => handlePasswordChange('currentPassword', e.target.value)}
+                      className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword" className="dark:text-gray-300">New Password</Label>
+                    <Input 
+                      id="newPassword" 
+                      type="password" 
+                      value={passwordData.newPassword}
+                      onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
+                      className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" className="dark:text-gray-300">Confirm New Password</Label>
+                    <Input 
+                      id="confirmPassword" 
+                      type="password" 
+                      value={passwordData.confirmPassword}
+                      onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
+                      className="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      required
+                    />
+                  </div>
+                  
+                  <Button type="submit" disabled={isSaving} className="w-full dark:bg-blue-600 dark:hover:bg-blue-700">
+                    {isSaving ? "Updating Password..." : "Update Password"}
+                  </Button>
+                </form>
               </CardContent>
             </Card>
 

@@ -109,12 +109,7 @@ export default function PrototypePage() {
       description: "Ready-to-mix concentrated tea for instant cold brew preparation",
       category: "Beverages",
       status: "Testing",
-      acceptability: 78,
-      feedback: [
-        { user: "Ram K.", rating: 4, comment: "Great taste, convenient packaging" },
-        { user: "Sita M.", rating: 5, comment: "Perfect for office use" },
-        { user: "Hari T.", rating: 3, comment: "Price seems high for the quantity" },
-      ],
+      acceptability: 78
     },
     {
       id: 2,
@@ -122,11 +117,7 @@ export default function PrototypePage() {
       description: "Organic herbal tea blend focused on immunity boosting",
       category: "Health & Wellness",
       status: "Concept",
-      acceptability: 65,
-      feedback: [
-        { user: "Maya S.", rating: 4, comment: "Love the health benefits focus" },
-        { user: "Bikash L.", rating: 4, comment: "Taste could be improved" },
-      ],
+      acceptability: 65
     },
   ]
 
@@ -428,67 +419,38 @@ export default function PrototypePage() {
 // Component for displaying regular prototypes
 function PrototypeCard({ prototype }: { prototype: any }) {
   return (
-            <Card key={prototype.id}>
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-xl">{prototype.name}</CardTitle>
-                    <CardDescription className="mt-1">{prototype.description}</CardDescription>
-                  </div>
-                  <Badge variant={prototype.status === "Testing" ? "default" : "secondary"}>{prototype.status}</Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
-                    <TrendingUp className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{prototype.acceptability}%</div>
-                    <div className="text-sm text-blue-700 dark:text-blue-300">Market Acceptability</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 dark:bg-green-900/30 rounded-lg">
-                    <Users className="h-6 w-6 text-green-600 dark:text-green-400 mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">{prototype.feedback.length}</div>
-                    <div className="text-sm text-green-700 dark:text-green-300">User Feedback</div>
-                  </div>
-                  <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
-                    <Star className="h-6 w-6 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-              {(prototype.feedback.reduce((acc: number, f: any) => acc + f.rating, 0) / prototype.feedback.length).toFixed(
-                        1,
-                      )}
-                    </div>
-                    <div className="text-sm text-purple-700 dark:text-purple-300">Avg Rating</div>
-                  </div>
-                </div>
+    <Card key={prototype.id}>
+      <CardHeader>
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle className="text-xl">{prototype.name}</CardTitle>
+            <CardDescription className="mt-1">{prototype.description}</CardDescription>
+          </div>
+          <Badge variant={prototype.status === "Testing" ? "default" : "secondary"}>{prototype.status}</Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+            <TrendingUp className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{prototype.acceptability}%</div>
+            <div className="text-sm text-blue-700 dark:text-blue-300">Market Acceptability</div>
+          </div>
+          <div className="text-center p-4 bg-green-50 dark:bg-green-900/30 rounded-lg">
+            <Users className="h-6 w-6 text-green-600 dark:text-green-400 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+              {prototype.category}
+            </div>
+            <div className="text-sm text-green-700 dark:text-green-300">Category</div>
+          </div>
+        </div>
 
-                <div>
-                  <h4 className="font-semibold mb-3 dark:text-white">User Feedback</h4>
-                  <div className="space-y-3">
-            {prototype.feedback.map((feedback: any, index: number) => (
-                      <div key={index} className="border rounded-lg p-3 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="font-medium dark:text-white">{feedback.user}</span>
-                          <div className="flex">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`h-4 w-4 ${i < feedback.rating ? "text-yellow-400 fill-current" : "text-gray-300 dark:text-gray-600"}`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{feedback.comment}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
+        <div className="flex gap-2">
           <Dialog>
             <DialogTrigger asChild>
-                  <Button variant="outline" className="flex-1">
-                    Edit Prototype
-                  </Button>
+              <Button variant="outline" className="flex-1">
+                Edit Prototype
+              </Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg">
               <DialogHeader>
@@ -510,31 +472,7 @@ function PrototypeCard({ prototype }: { prototype: any }) {
           
           <Dialog>
             <DialogTrigger asChild>
-                  <Button variant="outline" className="flex-1">
-                    Collect Feedback
-                  </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Collect Feedback - {prototype.name}</DialogTitle>
-                <DialogDescription>
-                  Set up a feedback collection campaign for this prototype.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-4 text-center">
-                <p className="text-amber-600 dark:text-amber-400">Feedback collection functionality coming soon!</p>
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="secondary">
-                  Close
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-          
-          <Dialog>
-            <DialogTrigger asChild>
-                  <Button className="flex-1">Launch Product</Button>
+              <Button className="flex-1">Launch Product</Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg">
               <DialogHeader>
@@ -553,9 +491,9 @@ function PrototypeCard({ prototype }: { prototype: any }) {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-                </div>
-              </CardContent>
-            </Card>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -593,7 +531,6 @@ function AIPrototypeCard({
     marketing: prototype.marketing || "",
     marketPotential: prototype.marketPotential || "",
     acceptabilityScore: prototype.acceptabilityScore || 0,
-    feedback: Array.isArray(prototype.feedback) ? prototype.feedback : [],
     generatedBy: prototype.generatedBy || "AI",
     status: prototype.status || "Concept",
     error: prototype.error || false
@@ -626,7 +563,7 @@ function AIPrototypeCard({
         </div>
       </CardHeader>
       <CardContent className="space-y-6 pt-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
             <TrendingUp className="h-6 w-6 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{safePrototype.acceptabilityScore || 0}%</div>
@@ -634,17 +571,8 @@ function AIPrototypeCard({
           </div>
           <div className="text-center p-4 bg-green-50 dark:bg-green-900/30 rounded-lg">
             <Users className="h-6 w-6 text-green-600 dark:text-green-400 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{safePrototype.feedback?.length || 0}</div>
-            <div className="text-sm text-green-700 dark:text-green-300">User Feedback</div>
-          </div>
-          <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
-            <Star className="h-6 w-6 text-purple-600 dark:text-purple-400 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-              {safePrototype.feedback && safePrototype.feedback.length > 0 
-                ? (safePrototype.feedback.reduce((acc: number, f: any) => acc + f.rating, 0) / safePrototype.feedback.length).toFixed(1)
-                : "0.0"}
-            </div>
-            <div className="text-sm text-purple-700 dark:text-purple-300">Avg Rating</div>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{safePrototype.category || "General"}</div>
+            <div className="text-sm text-green-700 dark:text-green-300">Category</div>
           </div>
         </div>
 
@@ -769,30 +697,6 @@ function AIPrototypeCard({
           )}
         </div>
 
-        {safePrototype.feedback && safePrototype.feedback.length > 0 && (
-          <div>
-            <h4 className="font-semibold mb-3 dark:text-white">User Feedback</h4>
-            <div className="space-y-3">
-              {safePrototype.feedback.map((feedback: any, index: number) => (
-                <div key={index} className="border rounded-lg p-3 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium dark:text-white">{feedback.user}</span>
-                    <div className="flex">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${i < feedback.rating ? "text-yellow-400 fill-current" : "text-gray-300 dark:text-gray-600"}`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{feedback.comment}</p>
-                </div>
-              ))}
-      </div>
-    </div>
-        )}
-
         <div className="flex gap-2">
           <Dialog>
             <DialogTrigger asChild>
@@ -809,30 +713,6 @@ function AIPrototypeCard({
               </DialogHeader>
               <div className="py-4 text-center">
                 <p className="text-amber-600 dark:text-amber-400">Edit functionality coming soon!</p>
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="secondary">
-                  Close
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-          
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="flex-1">
-                Collect Feedback
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Collect Feedback - {safePrototype.name}</DialogTitle>
-                <DialogDescription>
-                  Set up a feedback collection campaign for this prototype.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-4 text-center">
-                <p className="text-amber-600 dark:text-amber-400">Feedback collection functionality coming soon!</p>
               </div>
               <DialogFooter>
                 <Button type="button" variant="secondary">

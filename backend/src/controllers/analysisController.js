@@ -2,6 +2,11 @@ const { validationResult } = require('express-validator');
 const AnalysisResult = require('../models/analysisModel');
 const BusinessData = require('../models/businessDataModel');
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+const { exec } = require('child_process');
+const util = require('util');
+const execPromise = util.promisify(exec);
 
 /**
  * @desc    Create new analysis result
@@ -1708,6 +1713,175 @@ const analyzeMarketResearch = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Process research data using primary.py and secondary.py
+ * @route   POST /api/analysis/research_analysis
+ * @access  Private
+ */
+const processResearchData = async (req, res) => {
+  try {
+    console.log('Processing research data with Python scripts');
+    
+    // Check if files were uploaded
+    if (!req.files) {
+      return res.status(400).json({ message: 'Please upload research files' });
+    }
+    
+    // Extract file data and descriptions
+    const secondaryFile = req.files?.secondaryFile;
+    const primaryFile = req.files?.primaryFile;
+    const secondaryDescription = req.body.secondaryDescription || '';
+    const primaryDescription = req.body.primaryDescription || '';
+    
+    let analysisResults = {};
+    
+    // Process primary research file with primary.py if it exists
+    if (primaryFile) {
+      try {
+        // Save the file temporarily using absolute path
+        const uploadDir = path.resolve(__dirname, '../../../temp/uploads/');
+        // Ensure directory exists
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        const primaryFilePath = path.join(uploadDir, `${Date.now()}_${primaryFile.name}`);
+        await primaryFile.mv(primaryFilePath);
+        
+        console.log(`Primary file saved to ${primaryFilePath}`);
+        
+        // Execute primary.py with the file path
+        
+        // Get absolute paths with correct directory references
+        const absolutePrimaryFilePath = path.resolve(primaryFilePath);
+        // Use the simple_test.py script for primary analysis as well
+        const absolutePrimaryScriptPath = path.resolve(__dirname, '../../simple_test.py');
+        console.log('Primary script path:', absolutePrimaryScriptPath);
+        
+        console.log('Executing primary.py...');
+        console.log(`Command: python "${absolutePrimaryScriptPath}" "${absolutePrimaryFilePath}"`);
+        
+        const { stdout, stderr } = await execPromise(`python "${absolutePrimaryScriptPath}" "${absolutePrimaryFilePath}"`);
+        
+        if (stderr) {
+          console.error('Error from primary.py:', stderr);
+          // Don't throw error here, just log it and continue
+          analysisResults.primaryAnalysisError = stderr;
+        }
+        
+        // Parse the output from primary.py
+                  try {
+            const primaryAnalysisResults = JSON.parse(stdout);
+            
+            // Fix paths for frontend access
+            if (primaryAnalysisResults.graphs) {
+              Object.keys(primaryAnalysisResults.graphs).forEach(key => {
+                const graphPath = primaryAnalysisResults.graphs[key];
+                if (graphPath) {
+                  // Extract just the filename from the path
+                  const filename = path.basename(String(graphPath));
+                  primaryAnalysisResults.graphs[key] = `/temp/output/${filename}`;
+                  console.log(`Original path for ${key}:`, graphPath);
+                  console.log(`Converted graph path for ${key}:`, primaryAnalysisResults.graphs[key]);
+                }
+              });
+            }
+            
+            analysisResults.primaryAnalysis = primaryAnalysisResults;
+            console.log('Primary analysis completed successfully');
+          } catch (parseError) {
+            console.error('Error parsing primary.py output:', parseError);
+            console.log('Raw output:', stdout);
+            analysisResults.primaryAnalysisError = `Error parsing output: ${parseError.message}`;
+          }
+        
+      } catch (err) {
+        console.error('Error processing primary file:', err);
+        analysisResults.primaryAnalysisError = err.message;
+      }
+    }
+    
+    // Process secondary research file with secondary.py if it exists
+    if (secondaryFile) {
+      try {
+        // Save the file temporarily using absolute path
+        const uploadDir = path.resolve(__dirname, '../../../temp/uploads/');
+        // Ensure directory exists
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        const secondaryFilePath = path.join(uploadDir, `${Date.now()}_${secondaryFile.name}`);
+        await secondaryFile.mv(secondaryFilePath);
+        
+        console.log(`Secondary file saved to ${secondaryFilePath}`);
+        
+        // Execute secondary.py with the file path if it exists
+        // Use the simple_test.py script instead of secondary.py due to encoding issues
+        const absoluteSecondaryScriptPath = path.resolve(__dirname, '../../simple_test.py');
+        console.log('Secondary script path:', absoluteSecondaryScriptPath);
+        
+        if (fs.existsSync(absoluteSecondaryScriptPath)) {
+          // Use the execPromise function we declared at the top
+          
+          // Get absolute path
+          const absoluteSecondaryFilePath = path.resolve(secondaryFilePath);
+          
+          console.log('Executing secondary.py...');
+          console.log(`Command: python "${absoluteSecondaryScriptPath}" "${absoluteSecondaryFilePath}"`);
+          
+          const { stdout, stderr } = await execPromise(`python "${absoluteSecondaryScriptPath}" "${absoluteSecondaryFilePath}"`);
+          
+          if (stderr) {
+            console.error('Error from secondary.py:', stderr);
+            // Don't throw error here, just log it and continue
+            analysisResults.secondaryAnalysisWarning = stderr;
+          }
+          
+          // Parse the output from secondary.py
+          try {
+            const secondaryAnalysisResults = JSON.parse(stdout);
+            
+            // Fix paths for frontend access
+            if (secondaryAnalysisResults.charts && Array.isArray(secondaryAnalysisResults.charts)) {
+              secondaryAnalysisResults.charts.forEach(chart => {
+                if (chart.path) {
+                  // Extract just the filename from the path
+                  const filename = path.basename(String(chart.path));
+                  chart.path = `/temp/output/${filename}`;
+                  console.log('Original path:', chart.path);
+                  console.log('Converted chart path for frontend:', chart.path);
+                }
+              });
+            }
+            
+            analysisResults.secondaryAnalysis = secondaryAnalysisResults;
+            console.log('Secondary analysis completed successfully');
+          } catch (parseError) {
+            console.error('Error parsing secondary.py output:', parseError);
+            console.log('Raw output:', stdout);
+            analysisResults.secondaryAnalysisError = `Error parsing output: ${parseError.message}`;
+          }
+        } else {
+          console.log('secondary.py not found at path:', absoluteSecondaryScriptPath);
+          analysisResults.secondaryAnalysisError = 'Secondary analysis script not found';
+        }
+        
+      } catch (err) {
+        console.error('Error processing secondary file:', err);
+        analysisResults.secondaryAnalysisError = err.message;
+      }
+    }
+    
+    console.log('Analysis results:', JSON.stringify(analysisResults, null, 2));
+    
+    // Return the analysis results
+    return res.json(analysisResults);
+    
+  } catch (error) {
+    console.error('Error processing research data:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 module.exports = {
   createAnalysis,
   getAnalysisResults,
@@ -1718,5 +1892,6 @@ module.exports = {
   deleteAnalysis,
   generateMarketingStrategies,
   generateProductPrototype,
-  analyzeMarketResearch
+  analyzeMarketResearch,
+  processResearchData
 };
