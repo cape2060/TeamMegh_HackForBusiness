@@ -1,0 +1,3 @@
+@echo off
+echo Starting Niche Market API on port 8002...
+python -m uvicorn niche_market_api:app --reload --port 8002 

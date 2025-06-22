@@ -1,0 +1,11 @@
+product_name,date,units_sold,revenue,feedback,sentiment
+Wai Wai,2025-06-01,120,2400,"Loved the flavor and packaging. Definitely buying again!","positive"
+Maggi,2025-06-01,95,1900,"Tastes fine but arrived late. Could be better.","neutral"
+Samyang,2025-06-02,60,3000,"Way too spicy for me, not enjoyable.","negative"
+Rara,2025-06-02,80,1600,"Great taste and value for money!","positive"
+Wai Wai,2025-06-03,130,2600,"Got stale packets. Very disappointed.","negative"
+Maggi,2025-06-03,100,2000,"Perfect for quick meals. Always reliable.","positive"
+Samyang,2025-06-04,55,2750,"Delicious but very expensive.","neutral"
+Rara,2025-06-04,90,1800,"Packaging was damaged. Product still okay.","neutral"
+Wai Wai,2025-06-05,140,2800,"Kids love it. Will order again soon.","positive"
+Maggi,2025-06-05,110,2200,"Too salty this time. Not happy.","negative"
