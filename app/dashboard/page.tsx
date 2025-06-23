@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Factory, Settings, LogOut, Search, BarChart3, Lightbulb, Target, Megaphone, Upload, FileUp, Database, Eye } from "lucide-react"
+import { Factory, Settings, LogOut, Search, BarChart3, Lightbulb, Target, Megaphone, Upload, FileUp, Database, Eye, ArrowRight } from "lucide-react"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -125,129 +125,170 @@ export default function DashboardPage() {
       description: "Upload, view and analyze your business data",
       icon: Database,
       href: "/dashboard/data",
-      color: "from-indigo-500 to-indigo-600",
-      hoverColor: "hover:from-indigo-600 hover:to-indigo-700",
+      color: "bg-primary/10 text-primary",
+      hoverEffect: "hover:bg-primary/15",
     },
     {
       title: "Start Research",
       description: "Begin collecting Secondary & Primary data",
       icon: Search,
       href: "/dashboard/research",
-      color: "from-blue-500 to-blue-600",
-      hoverColor: "hover:from-blue-600 hover:to-blue-700",
+      color: "bg-indigo-500/10 text-indigo-500",
+      hoverEffect: "hover:bg-indigo-500/15",
     },
     {
       title: "BCG Matrix Analysis",
       description: "Analyze product performance by market share vs growth",
       icon: BarChart3,
       href: "/dashboard/bcg-matrix",
-      color: "from-green-500 to-green-600",
-      hoverColor: "hover:from-green-600 hover:to-green-700",
+      color: "bg-emerald-500/10 text-emerald-500",
+      hoverEffect: "hover:bg-emerald-500/15",
     },
     {
       title: "Product Prototype",
       description: "Manage product ideas, test acceptability",
       icon: Lightbulb,
       href: "/dashboard/prototype",
-      color: "from-purple-500 to-purple-600",
-      hoverColor: "hover:from-purple-600 hover:to-purple-700",
+      color: "bg-violet-500/10 text-violet-500",
+      hoverEffect: "hover:bg-violet-500/15",
     },
     {
       title: "Niche Marketing",
       description: "Build personalized marketing plans for target groups",
       icon: Target,
       href: "/dashboard/marketing",
-      color: "from-orange-500 to-orange-600",
-      hoverColor: "hover:from-orange-600 hover:to-orange-700",
+      color: "bg-amber-500/10 text-amber-500",
+      hoverEffect: "hover:bg-amber-500/15",
     },
     {
       title: "Marketing Strategies",
       description: "Build campaign strategies based on customer behavior",
       icon: Megaphone,
       href: "/dashboard/strategies",
-      color: "from-pink-500 to-pink-600",
-      hoverColor: "hover:from-pink-600 hover:to-pink-700",
+      color: "bg-pink-500/10 text-pink-500",
+      hoverEffect: "hover:bg-pink-500/15",
     },
   ]
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+          <div className="relative w-16 h-16 mx-auto mb-4">
+            <div className="absolute inset-0 rounded-full border-4 border-primary/20 animate-pulse"></div>
+            <div className="absolute top-0 left-0 w-16 h-16 border-4 border-t-primary border-transparent rounded-full animate-spin"></div>
+          </div>
+          <p className="text-slate-600 dark:text-slate-400 font-medium animate-pulse">Loading dashboard...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Top Navbar */}
-      <header className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 shadow-sm">
-        <div className="px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 relative overflow-hidden rounded-full border-2 border-blue-500 flex items-center justify-center bg-white">
-              <Image 
-                src="/logo/logo.png"
-                alt="BIZCO Logo"
-                width={40}
-                height={40}
-                className="object-contain"
-              />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">bizco.np</h1>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* Notifications removed */}
-            <Link href="/dashboard/settings">
-              <Button variant="outline" size="sm" className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
-                <Settings className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Button variant="outline" size="sm" onClick={handleLogout} className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <div className="p-6">
+    <div className="min-h-screen">
+      <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
         {/* Welcome Header */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome, {userName} 👋</h2>
-          <p className="text-gray-600 dark:text-gray-400">Choose a tool to start optimizing your business strategy</p>
+        <div className="mb-10">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2 flex items-center">
+                Welcome, <span className="text-gradient-primary ml-2">{userName}</span>
+                <span className="inline-block animate-float ml-2">👋</span>
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400 text-lg">
+                Choose a tool to start optimizing your business strategy
+              </p>
+            </div>
+            
+            <div className="flex-shrink-0">
+              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm px-4 py-3 border border-slate-200 dark:border-slate-700">
+                <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">Current Organization</div>
+                <div className="font-semibold text-slate-900 dark:text-slate-100">{companyName}</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="h-1 w-24 bg-gradient-to-r from-primary to-indigo-500 rounded-full mb-6"></div>
         </div>
 
         {/* Dashboard Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {dashboardCards.map((card, index) => {
             const Icon = card.icon
             return (
-              <Link key={index} href={card.href}>
-                <Card className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-white dark:bg-gray-800 dark:border-gray-700">
-                  <CardHeader className="pb-4">
-                    <div
-                      className={`w-12 h-12 rounded-lg bg-gradient-to-r ${card.color} ${card.hoverColor} flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-110`}
-                    >
-                      <Icon className="h-6 w-6 text-white" />
+              <Link key={index} href={card.href} className="group block h-full">
+                <Card variant="default" className="h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-slate-200/75 dark:border-slate-800/75">
+                  <CardHeader className="pb-2">
+                    <div className={`w-12 h-12 rounded-lg ${card.color} flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-110 ${card.hoverEffect}`}>
+                      <Icon className="h-6 w-6" />
                     </div>
-                    <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+                    <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">
                       {card.title}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="text-gray-600 dark:text-gray-400 leading-relaxed">{card.description}</CardDescription>
+                    <CardDescription className="text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                      {card.description}
+                    </CardDescription>
+                    <div className="flex items-center text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span>Get started</span>
+                      <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                    </div>
                   </CardContent>
                 </Card>
               </Link>
             )
           })}
         </div>
-
-        {/* Stats section removed */}
+        
+        {/* Recent Activity Section */}
+        {uploadedData.length > 0 && (
+          <div className="mt-12">
+            <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-6">
+              Recent Activity
+            </h3>
+            <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-sm border border-slate-200/75 dark:border-slate-700/50 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-slate-50 dark:bg-slate-800/80">
+                    <tr>
+                      <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Type</th>
+                      <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Name</th>
+                      <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Date</th>
+                      <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                    {uploadedData.slice(0, 5).map((item, index) => (
+                      <tr key={index} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/30 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                            {item.type || "Data"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-200">{item.name || "Untitled"}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
+                          {item.date ? formatDate(item.date) : "N/A"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">
+                            Active
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/10 px-2 py-1 h-auto">
+                            <Eye className="h-4 w-4 mr-1" /> View
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

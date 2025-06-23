@@ -12,7 +12,6 @@ import shutil
 from typing import Optional
 import numpy as np
 from jinja2 import Environment, FileSystemLoader
-from weasyprint import HTML
 
 app = FastAPI()
 
@@ -228,7 +227,7 @@ def analyze_data(file_path, timestamp):
 
 @app.get("/download_secondary_report/{timestamp}")
 async def download_secondary_report(timestamp: str):
-    """Generate and download a PDF report for secondary research analysis"""
+    """Generate and download an HTML report for secondary research analysis"""
     try:
         # Create template directory if it doesn't exist
         template_dir = os.path.join(os.path.dirname(__file__), 'templates')
@@ -399,19 +398,20 @@ async def download_secondary_report(timestamp: str):
             charts=mock_result["charts"]
         )
         
-        # Generate PDF
-        pdf_path = os.path.join(temp_dir, f'secondary_research_report_{timestamp_str}.pdf')
-        HTML(string=html_content, base_url=os.path.dirname(__file__)).write_pdf(pdf_path)
+        # Save HTML file
+        html_path = os.path.join(temp_dir, f'secondary_research_report_{timestamp_str}.html')
+        with open(html_path, 'w', encoding='utf-8') as f:
+            f.write(html_content)
         
-        # Return the PDF file
+        # Return the HTML file
         return FileResponse(
-            path=pdf_path, 
-            filename=f'secondary_research_report_{timestamp_str}.pdf',
-            media_type='application/pdf'
+            path=html_path,
+            filename=f'secondary_research_report_{timestamp_str}.html',
+            media_type='text/html'
         )
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to generate PDF: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate HTML report: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
