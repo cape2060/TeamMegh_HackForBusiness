@@ -144,19 +144,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </Button>
 
           <div className="flex items-center gap-2">
-            <div className="logo-container">
-              <div className="logo-pulse"></div>
-              <div className="logo-inner">
-                <Image
-                  src="/logo/logo.png"
-                  alt="bizco.np Logo"
-                  width={24}
-                  height={24}
-                  className="object-contain"
-                />
-              </div>
-            </div>
-            <span className="font-semibold text-gradient-primary">bizco.np</span>
+            <Image
+              src="/logo/name.png"
+              alt="Bizco"
+              width={100}
+              height={30}
+              className="object-contain"
+            />
           </div>
           
           {/* Theme toggle on mobile */}
@@ -191,19 +185,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Sidebar Header */}
         <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800/50 px-6 py-5 md:py-6">
           <div className="flex items-center gap-2.5">
-            <div className="logo-container">
-              <div className="logo-pulse"></div>
-              <div className="logo-inner">
-                <Image
-                  src="/logo/logo.png"
-                  alt="bizco.np Logo"
-                  width={28}
-                  height={28}
-                  className="object-contain"
-                />
-              </div>
-            </div>
-            <span className="font-bold text-lg text-gradient-primary">bizco.np</span>
+            <Image
+              src="/logo/name.png"
+              alt="Bizco"
+              width={120}
+              height={36}
+              className="object-contain"
+            />
           </div>
           <Button 
             variant="ghost" 

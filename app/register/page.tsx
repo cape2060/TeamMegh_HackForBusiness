@@ -111,17 +111,20 @@ export default function RegisterPage() {
       <Card className="w-full max-w-2xl dark:bg-gray-800 dark:border-gray-700">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="h-16 w-16 relative overflow-hidden">
-              <Image 
-                src="/logo/logo.png"
-                alt="bizco.np Logo"
-                width={64}
-                height={64}
-                className="object-contain"
-              />
+            <div className="logo-container scale-150">
+              <div className="logo-pulse"></div>
+              <div className="logo-inner">
+                <Image 
+                  src="/logo/logo.png"
+                  alt="Bizco Logo"
+                  width={24}
+                  height={24}
+                  className="object-contain"
+                />
+              </div>
             </div>
           </div>
-          <CardTitle className="text-2xl dark:text-white">Join bizco.np</CardTitle>
+          <CardTitle className="text-2xl dark:text-white">Join Bizco</CardTitle>
           <CardDescription className="dark:text-gray-400">Register your production business for AI-powered coaching and insights</CardDescription>
         </CardHeader>
         <CardContent>

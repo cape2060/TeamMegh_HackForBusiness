@@ -46,19 +46,13 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="logo-container">
-                <div className="logo-pulse"></div>
-                <div className="logo-inner">
-                  <Image
-                    src="/logo/logo.png"
-                    alt="bizco.np Logo"
-                    width={28}
-                    height={28}
-                    className="object-contain"
-                  />
-                </div>
-              </div>
-              <span className="font-bold text-xl text-gradient-primary">bizco.np</span>
+              <Image
+                src="/logo/name.png"
+                alt="Bizco"
+                width={120}
+                height={36}
+                className="object-contain"
+              />
             </div>
             
             <div className="hidden md:flex items-center gap-6">
@@ -183,57 +177,32 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative pt-20 pb-16 sm:pt-24 sm:pb-20 md:pt-32 md:pb-24 overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-12 md:gap-8 items-center">
-            <div className="text-center md:text-left max-w-2xl mx-auto md:mx-0">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">
+          <div className="flex justify-center">
+            <div className="text-center max-w-3xl mx-auto">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-8">
                 <span className="text-slate-900 dark:text-slate-100">Transform your business with </span>
-                <span className="text-gradient-primary">data-driven</span>
-                <span className="text-slate-900 dark:text-slate-100"> decisions</span>
+                <span className="text-gradient-primary">data-driven decisions</span>
               </h1>
-              <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
-                Your all-in-one platform for market research, product portfolio analysis, 
-                and strategic business planning. Get actionable insights to grow your business.
+              <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed">
+                From BCG Matrix analysis to niche marketing strategies, get AI-powered insights for product development,
+                market research, and strategic planning. Perfect for Nepali production businesses ready to scale.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/register">
-                  <Button className="btn-gradient-pill text-base h-12 px-8">
-                    Get started for free
+                  <Button 
+                    size="lg" 
+                    className="bg-primary hover:bg-primary/90 text-white h-12 px-8">
+                    Get Started
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href="#features">
-                  <Button variant="outline" className="border-slate-200 dark:border-slate-700 text-base h-12 px-8">
-                    Explore features
-                    <ChevronRight className="ml-1 h-5 w-5" />
-                  </Button>
-                </Link>
-              </div>
-
-              <div className="mt-12 flex items-center justify-center md:justify-start space-x-6">
-                <div className="flex -space-x-3">
-                  <div className="h-10 w-10 rounded-full border-2 border-white dark:border-slate-800 bg-slate-200 dark:bg-slate-700" />
-                  <div className="h-10 w-10 rounded-full border-2 border-white dark:border-slate-800 bg-slate-300 dark:bg-slate-600" />
-                  <div className="h-10 w-10 rounded-full border-2 border-white dark:border-slate-800 bg-slate-400 dark:bg-slate-500" />
-                </div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">
-                  <span className="font-semibold text-slate-900 dark:text-slate-200">500+</span> businesses trust bizco.np
-                </div>
-              </div>
-            </div>
-
-            <div className="relative hidden md:block">
-              <div className="absolute inset-0 bg-primary/5 -z-10 rounded-3xl transform rotate-3"></div>
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-indigo-500/10 -z-10 rounded-3xl transform -rotate-2"></div>
-              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-4 transform transition-transform hover:scale-[1.02] duration-500">
-                <div className="aspect-[16/10] bg-slate-100 dark:bg-slate-700 rounded-lg overflow-hidden">
-                  <Image 
-                    src="/placeholder.jpg" 
-                    alt="Dashboard Preview"
-                    width={1200}
-                    height={750}
-                    className="object-cover"
-                  />
-                </div>
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="border-primary text-primary hover:bg-primary/10 h-12 px-8">
+                  Learn More
+                  <ChevronRight className="ml-1 h-5 w-5" />
+                </Button>
               </div>
             </div>
           </div>
@@ -323,7 +292,7 @@ export default function Home() {
             <div className="relative z-10">
               <h2 className="text-3xl sm:text-4xl font-bold mb-4">Ready to transform your business?</h2>
               <p className="text-lg text-white/90 mb-8 max-w-2xl">
-                Join hundreds of businesses already using bizco.np to make data-driven decisions and grow their market share.
+                Join hundreds of businesses already using Bizco to make data-driven decisions and grow their market share.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/register">
@@ -348,22 +317,16 @@ export default function Home() {
           <div className="flex flex-col md:flex-row md:justify-between mb-8">
             <div className="mb-8 md:mb-0">
               <div className="flex items-center gap-2.5 mb-4">
-                <div className="logo-container">
-                  <div className="logo-pulse"></div>
-                  <div className="logo-inner">
-                    <Image 
-                      src="/logo/logo.png"
-                      alt="bizco.np Logo"
-                      width={24}
-                      height={24}
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-                <span className="font-bold text-xl text-gradient-primary">bizco.np</span>
+                <Image 
+                  src="/logo/name.png"
+                  alt="Bizco"
+                  width={120}
+                  height={36}
+                  className="object-contain"
+                />
               </div>
               <p className="text-slate-600 dark:text-slate-400 max-w-xs">
-                Your partner in data-driven business growth through market research and strategic planning.
+                A modern business intelligence platform for market analysis and strategic planning.
               </p>
             </div>
             
@@ -430,7 +393,7 @@ export default function Home() {
           
           <div className="border-t border-slate-200 dark:border-slate-800 pt-8 mt-8 text-center md:flex md:justify-between md:text-left">
             <p className="text-slate-600 dark:text-slate-400 text-sm">
-              © {new Date().getFullYear()} bizco.np. All rights reserved.
+              © {new Date().getFullYear()} Bizco. All rights reserved.
             </p>
             <div className="flex justify-center mt-4 md:mt-0 space-x-6">
               <Link href="#" className="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary">

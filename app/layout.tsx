@@ -12,10 +12,10 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'bizco.np - Business Analytics Platform',
+  title: 'Bizco - Business Analytics Platform',
   description: 'Strategic business analytics platform for product portfolio and market research analysis',
   keywords: 'business intelligence, market research, BCG matrix, production business, Nepal',
-  authors: [{ name: 'bizco.np team' }],
+  authors: [{ name: 'Bizco team' }],
   viewport: 'width=device-width, initial-scale=1.0',
 }
 

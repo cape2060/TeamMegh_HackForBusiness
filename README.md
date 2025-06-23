@@ -1,61 +1,108 @@
-# ProductionCoach AI
+# Bizco - Business Analytics Platform
 
-A Next.js application providing AI-powered business intelligence for production businesses, with features like BCG Matrix analysis, market research, product prototyping, and niche marketing strategies.
+A Next.js application providing data-driven business intelligence for product portfolio and market research analysis, featuring BCG Matrix analysis, market research tools, product prototyping, and niche marketing strategies.
+
+![Theme Color](https://via.placeholder.com/15/5E63B6/5E63B6.png) **Theme Color:** #5E63B6
+
+## Key Features
+
+### Business Intelligence Dashboard
+- **Modern Dashboard**: Responsive interface with intuitive navigation and at-a-glance metrics
+- **Dark/Light Mode**: Seamless theme switching with user preference persistence
+- **Interactive Charts**: Dynamic data visualization with hover effects and tooltips
+- **Recent Activity Tracking**: Monitor and manage your uploaded data and analyses
+
+### Analytics Tools
+- **BCG Matrix Analysis**: Visualize product portfolio performance by market share vs. growth
+- **Market Research**: Tools for analyzing both primary and secondary research data
+- **Data Management**: Upload, organize, and analyze business data through intuitive interfaces
+- **Visual Reports**: Generate comprehensive HTML reports with charts, insights, and key metrics
+
+### Strategic Planning
+- **Product Prototyping**: Develop and test product concepts before full investment
+- **Niche Marketing**: Identify and target profitable market segments with personalized strategies
+- **Strategic Campaigns**: Build marketing strategies based on customer behavior analysis
+- **Competitive Analysis**: Analyze competitor positioning and identify market opportunities
+
+### User Experience
+- **Modern UI/UX**: Clean, intuitive interface with smooth transitions and animations
+- **Responsive Design**: Fully adaptive layout for mobile, tablet, and desktop
+- **Accessibility**: Optimized with proper contrast, font sizing, and focus management
+- **Performance Optimized**: Fast loading times and smooth interactions
 
 ## Tech Stack
 
 ### Frontend
-- **Framework**: Next.js 15
-- **UI Components**: Shadcn UI (Radix UI + Tailwind CSS)
-- **Styling**: Tailwind CSS
-- **Charts**: Recharts
-- **Form Handling**: React Hook Form + Zod validation
+- **Framework**: Next.js 14
+- **UI Components**: Shadcn UI (based on Radix UI)
+- **Styling**: Tailwind CSS with custom theme
+- **Charts**: Chart.js with react-chartjs-2
+- **Animations**: CSS animations and transitions
+- **Theme Management**: next-themes
 
 ### Backend
-- **Framework**: Express.js
+- **API Framework**: Express.js
 - **Database**: PostgreSQL
 - **Authentication**: JWT
-- **Validation**: Express Validator
+- **Data Processing**: Python scripts for data analysis
+- **Visualization**: Matplotlib for chart generation
+- **Template Engine**: Jinja2 for report generation
 
-## Prerequisites
+## Getting Started
 
+### Prerequisites
 - Node.js 18.x or higher
-- PostgreSQL 12.x or higher (download from https://www.postgresql.org/download/)
+- PostgreSQL 12.x or higher
+- Python 3.8+ (for data analysis scripts)
 - pnpm (recommended) or npm
 
-## Detailed Setup Instructions
+### Installation
 
-### PostgreSQL Database Setup
-
-1. **Install PostgreSQL**
-   - Download and install PostgreSQL from https://www.postgresql.org/download/
-   - During installation, set a password for the default 'postgres' user
-   - Keep note of the port number (default is 5432)
-
-2. **Create Database**
-   - Open pgAdmin (installed with PostgreSQL) or use the PostgreSQL command line
-   - Create a new database called 'productioncoach':
-     - Using pgAdmin: Right-click on Databases > Create > Database... > Enter 'productioncoach'
-     - Using command line: 
-       ```
-       psql -U postgres
-       CREATE DATABASE productioncoach;
-       \q
-       ```
-
-### Backend Setup
-
-1. **Install dependencies**
-
+#### Frontend Setup
+1. **Clone the repository and install dependencies**
 ```bash
-cd hackathon2/backend
+git clone https://github.com/yourusername/bizco-np.git
+cd bizco-np
+
+# Using pnpm (recommended)
+pnpm install
+
+# Or using npm
 npm install
 ```
 
-2. **Create environment variables file**
+2. **Create environment configuration**
+Create a `.env.local` file in the project root:
+```
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+```
 
-Create a new file named `.env` in the backend directory (hackathon2/backend/.env) with the following content:
+3. **Start the development server**
+```bash
+pnpm dev
+# or
+npm run dev
+```
 
+4. **Access the application**
+Open [http://localhost:3000](http://localhost:3000) in your browser
+
+#### Backend Setup
+
+1. **Install Node.js dependencies**
+```bash
+cd backend
+npm install
+```
+
+2. **Install Python dependencies for data analysis scripts**
+```bash
+pip install -r requirements.txt
+```
+
+3. **Configure database**
+Create a `.env` file in the `/backend` directory:
 ```
 # Server Configuration
 PORT=5000
@@ -64,77 +111,80 @@ NODE_ENV=development
 # PostgreSQL Configuration
 PGUSER=postgres
 PGHOST=localhost
-PGDATABASE=productioncoach
+PGDATABASE=bizco_np
 PGPASSWORD=your_postgres_password_here
 PGPORT=5432
 
 # JWT Configuration
-JWT_SECRET=productioncoach_secret_key_change_in_production
+JWT_SECRET=bizco_np_secret_key_change_in_production
 JWT_EXPIRATION=1d
 
 # Logging
 LOG_LEVEL=info
 ```
 
-Be sure to replace `your_postgres_password_here` with the password you set during PostgreSQL installation.
-
-3. **Initialize the database**
-
+4. **Initialize the database**
 ```bash
-node initDb.js
+node src/utils/initDb.js
 ```
 
-This will create the necessary tables in your PostgreSQL database.
-
-4. **Start the backend server**
-
+5. **Start the backend server**
 ```bash
 npm run dev
 ```
 
 The API will be available at http://localhost:5000.
-You can test it by visiting http://localhost:5000 in your browser, which should display a JSON message: `{"message":"ProductionCoach API is running..."}`.
 
-### Frontend Setup
-
-1. **Install dependencies**
-
+### Running Secondary API (Python)
+Start the secondary API for data analysis:
 ```bash
-# Navigate to the project root
-cd hackathon2
-
-# Using pnpm (recommended)
-pnpm install --no-strict-peer-dependencies
-
-# Or using npm
-npm install --legacy-peer-deps
+cd backend
+python secondary_api.py
 ```
+This will run on http://localhost:8001.
 
-The flags are necessary to resolve dependency conflicts with the date-fns package.
+## PostgreSQL Database Setup
 
-2. **Create environment variables file (optional)**
+1. **Install PostgreSQL**
+   - Download from https://www.postgresql.org/download/
+   - Set a password for the 'postgres' user during installation
 
-For frontend development, we can create a `.env.local` file in the project root with the following content:
+2. **Create Database**
+   - Using pgAdmin: Right-click on Databases > Create > Database... > Enter 'bizco_np'
+   - Using command line: 
+     ```
+     psql -U postgres
+     CREATE DATABASE bizco_np;
+     \q
+     ```
+
+## Project Structure
 
 ```
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
+bizco-np/
+├── app/                    # Next.js app directory
+│   ├── dashboard/          # Dashboard pages and features
+│   ├── login/              # Authentication pages
+│   ├── register/           # User registration
+│   └── globals.css         # Global styles
+├── components/             # React components
+│   ├── ui/                 # UI components (buttons, cards, etc.)
+│   └── theme-provider.tsx  # Theme provider component
+├── public/                 # Static assets
+├── hooks/                  # Custom React hooks
+├── lib/                    # Utility functions
+├── backend/                # Backend API
+│   ├── src/                # Node.js backend source
+│   │   ├── controllers/    # API controllers
+│   │   ├── models/         # Database models
+│   │   ├── routes/         # API routes
+│   │   └── middleware/     # Express middleware
+│   ├── secondary_api.py    # Python data analysis API
+│   └── requirements.txt    # Python dependencies
+└── temp/                   # Temporary files
+    ├── output/             # Generated charts and reports
+    └── uploads/            # Uploaded data files
 ```
-
-This will allow the frontend to communicate with the backend API.
-
-3. **Run the development server**
-
-```bash
-# Using pnpm
-pnpm dev
-
-# Or using npm
-npm run dev
-```
-
-4. **Access the application**
-
-Navigate to [http://localhost:3000](http://localhost:3000) in your browser to see the frontend application running.
 
 ## API Testing
 
@@ -163,70 +213,62 @@ Content-Type: application/json
 }
 ```
 
-The login will return a JWT token that can be used to authenticate subsequent requests.
+### Upload Business Data
+```
+POST http://localhost:5000/api/business-data
+Authorization: Bearer YOUR_JWT_TOKEN
+Content-Type: multipart/form-data
+
+file: [your_data_file.csv]
+type: "company_profile"
+```
+
+## Available Scripts
+
+### Frontend
+- `pnpm dev`: Start development server
+- `pnpm build`: Build for production
+- `pnpm start`: Start production server
+- `pnpm lint`: Run linter
+
+### Backend (Node.js)
+- `npm start`: Run the server in production mode
+- `npm run dev`: Run the server in development mode with nodemon
 
 ## Troubleshooting
 
-### Database Connection Issues
-- Verify PostgreSQL is running using pgAdmin or the system services
-- Check that the credentials in the `.env` file match your PostgreSQL setup
+### Database Issues
+- Verify PostgreSQL is running using pgAdmin or system services
+- Check that credentials in the `.env` file match your PostgreSQL setup
 - Ensure there are no firewall restrictions blocking access to port 5432
-
-### Frontend Dependency Issues
-- If you encounter dependency conflicts, try using the `--force` flag with npm or the `--no-strict-peer-dependencies` flag with pnpm
-- Make sure you're using Node.js version 18 or higher
 
 ### API Connection Issues
 - Ensure both frontend and backend are running simultaneously
 - Check that the backend is running on port 5000 and frontend on port 3000
 - Verify there are no CORS issues by checking the browser's developer console
 
-## Project Structure
+### Python Analysis Issues
+- Ensure all required Python packages are installed
+- Check if matplotlib is properly configured
+- Verify file permissions for temp directories are set correctly
 
-- **/app**: Next.js app directory containing pages and routes
-  - **/dashboard**: Dashboard pages for different features
-  - **/login**: Authentication pages
-  - **/register**: User registration
-- **/components**: Reusable UI components
-  - **/ui**: Shadcn UI components
-- **/lib**: Utility functions
-- **/public**: Static assets
-- **/styles**: Global styles
-- **/backend**: Backend API
-  - **/src**: Source code
-    - **/config**: Configuration files
-    - **/controllers**: API controllers
-    - **/models**: Database models
-    - **/routes**: API routes
-    - **/middleware**: Express middleware
-    - **/utils**: Utility functions
-  - **/db**: Database files
+## User Interface Features
 
-## Features
+- **Modern Design**: Clean, professional interface with consistent styling
+- **Responsive Layout**: Adapts seamlessly to different screen sizes
+- **Interactive Elements**: Hover effects, transitions, and animations for better UX
+- **Accessible Components**: Proper contrast ratios and keyboard navigation
+- **Theme Options**: Light and dark mode with system preference detection
+- **Data Visualizations**: Clear charts and graphs with consistent styling
+- **Intuitive Navigation**: Logical structure with breadcrumbs and clear paths
 
-- **Dashboard**: Main interface for accessing all tools
-- **BCG Matrix Analysis**: Analyze product performance by market share vs growth
-- **Market Research**: Automated primary & secondary research tools
-- **Product Prototyping**: AI-generated product concepts and development roadmaps
-- **Niche Marketing**: Tools for identifying untapped market segments
-- **Marketing Strategies**: Campaign strategy builder based on customer behavior
+## License
 
-## Available Scripts
+This project is licensed under the MIT License.
 
-### Frontend
-- `pnpm dev`: Run development server
-- `pnpm build`: Build for production
-- `pnpm start`: Start production server
-- `pnpm lint`: Run linter
-
-### Backend
-- `npm start`: Run the server in production mode
-- `npm run dev`: Run the server in development mode with nodemon
-- `npm test`: Run tests
-
-## Notes
-
-- The frontend is configured to run on port 3000 by default
-- The backend API is configured to run on port 5000 by default
-- The project uses Next.js App Router for routing
-- UI components are from Shadcn UI library, which is built on top of Radix UI and Tailwind CSS
+## Acknowledgements
+- [Next.js](https://nextjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Shadcn UI](https://ui.shadcn.com/)
+- [Chart.js](https://www.chartjs.org/)
+- [Framer Motion](https://www.framer.com/motion/)
