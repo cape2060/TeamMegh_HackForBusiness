@@ -7,28 +7,41 @@ A Next.js application providing data-driven business intelligence for product po
 ## Key Features
 
 ### Business Intelligence Dashboard
-- **Modern Dashboard**: Responsive interface with intuitive navigation and at-a-glance metrics
-- **Dark/Light Mode**: Seamless theme switching with user preference persistence
-- **Interactive Charts**: Dynamic data visualization with hover effects and tooltips
-- **Recent Activity Tracking**: Monitor and manage your uploaded data and analyses
+A modern, responsive dashboard to help businesses track metrics, customer behavior, and insights — all in one place.
 
+Dark and Light Modes for a personalized experience with automatic theme memory.
+
+Interactive charts and reports that make data understandable at a glance.
+
+Stay on top of everything with recent activity tracking for uploads and analyses.
 ### Analytics Tools
-- **BCG Matrix Analysis**: Visualize product portfolio performance by market share vs. growth
-- **Market Research**: Tools for analyzing both primary and secondary research data
-- **Data Management**: Upload, organize, and analyze business data through intuitive interfaces
-- **Visual Reports**: Generate comprehensive HTML reports with charts, insights, and key metrics
+BCG Matrix Visualization to assess product performance by market share and growth.
+
+Tools to support both primary and secondary market research workflows.
+
+Upload, organize, and analyze business data easily — no technical skills required.
+
+Generate beautiful HTML reports with key metrics and auto-generated insights.
+
 
 ### Strategic Planning
-- **Product Prototyping**: Develop and test product concepts before full investment
-- **Niche Marketing**: Identify and target profitable market segments with personalized strategies
-- **Strategic Campaigns**: Build marketing strategies based on customer behavior analysis
-- **Competitive Analysis**: Analyze competitor positioning and identify market opportunities
+Product prototyping tools help test ideas before investing fully.
+
+Identify profitable audiences through niche marketing insights.
+
+Build customer-driven campaigns based on real behavioral patterns.
+
+Run competitive analysis to understand where your business stands in the market.
 
 ### User Experience
-- **Modern UI/UX**: Clean, intuitive interface with smooth transitions and animations
-- **Responsive Design**: Fully adaptive layout for mobile, tablet, and desktop
-- **Accessibility**: Optimized with proper contrast, font sizing, and focus management
-- **Performance Optimized**: Fast loading times and smooth interactions
+Clean and modern UI with subtle animations and intuitive layout.
+
+Fully responsive design across mobile, tablet, and desktop.
+
+Built-in accessibility features: proper contrast, font scaling, focus states.
+
+Optimized for performance with fast load times and seamless interaction.
+
 
 ## Tech Stack
 
