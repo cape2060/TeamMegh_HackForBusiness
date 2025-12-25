@@ -57,7 +57,15 @@ export default function RegisterPage() {
       const userData = await userResponse.json()
 
       if (!userResponse.ok) {
-        throw new Error(userData.message || 'Registration failed')
+        // Handle specific error messages from the server
+        if (userData.message) {
+          throw new Error(userData.message)
+        } else if (userData.errors && userData.errors.length > 0) {
+          // Handle validation errors from express-validator
+          throw new Error(userData.errors[0].msg)
+        } else {
+          throw new Error('Registration failed. Please try again.')
+        }
       }
 
       // Store user data and token in localStorage

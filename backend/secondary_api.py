@@ -12,7 +12,33 @@ import shutil
 from typing import Optional
 import numpy as np
 from jinja2 import Environment, FileSystemLoader
-from weasyprint import HTML
+import sys
+import platform
+
+# Check if running on Windows
+IS_WINDOWS = platform.system() == "Windows"
+
+# Try to import WeasyPrint and handle dependencies gracefully
+WEASYPRINT_AVAILABLE = False
+PDF_GENERATION_ERROR = None
+try:
+    from weasyprint import HTML
+    WEASYPRINT_AVAILABLE = True
+except ImportError as e:
+    PDF_GENERATION_ERROR = f"WeasyPrint import failed: {str(e)}"
+    print(f"WeasyPrint import failed: {str(e)}")
+    print("PDF generation will be disabled.")
+    print("For PDF support, install WeasyPrint: pip install weasyprint")
+except OSError as e:
+    PDF_GENERATION_ERROR = f"WeasyPrint dependency error: {str(e)}"
+    print(f"WeasyPrint dependency error: {str(e)}")
+    print("PDF generation will be disabled due to missing system dependencies.")
+    if IS_WINDOWS:
+        print("On Windows, you need to install GTK3 manually:")
+        print("1. Download and install GTK3 from: https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases")
+        print("2. Ensure the GTK3 bin directory is in your PATH environment variable")
+    else:
+        print("For dependencies: https://doc.courtbouillon.org/weasyprint/stable/first_steps.html")
 
 app = FastAPI()
 
