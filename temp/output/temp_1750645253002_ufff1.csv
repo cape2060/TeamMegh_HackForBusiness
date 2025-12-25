@@ -1,0 +1,11 @@
+product,category,sales,profit_margin,customer_segment
+iPhone 15,Smartphones,95000,0.35,Tech Enthusiasts
+Galaxy S24,Smartphones,87000,0.32,Professionals
+MacBook Air,Laptops,78000,0.30,Students
+Dell XPS 13,Laptops,62000,0.28,Freelancers
+Canon EOS R7,Cameras,30000,0.22,Photographers
+Sony A6400,Cameras,32000,0.25,Content Creators
+DJI Mini 3 Pro,Drones,27000,0.40,Travel Bloggers
+Autel Evo Lite,Drones,22000,0.36,Real Estate Agents
+Apple Watch SE,Smart Wearables,45000,0.29,Fitness Fans
+Fitbit Charge 5,Smart Wearables,41000,0.27,Health Conscious

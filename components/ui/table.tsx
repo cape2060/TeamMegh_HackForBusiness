@@ -4,12 +4,22 @@ import { cn } from "@/lib/utils"
 
 const Table = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLTableElement> & {
+    variant?: "default" | "striped" | "hoverable" | "outline" | "cards"
+  }
+>(({ className, variant = "default", ...props }, ref) => (
   <div className="relative w-full overflow-auto">
     <table
       ref={ref}
-      className={cn("w-full caption-bottom text-sm", className)}
+      className={cn(
+        "w-full caption-bottom text-sm",
+        variant === "default" && "border-collapse",
+        variant === "striped" && "border-collapse table-striped",
+        variant === "hoverable" && "border-collapse table-hoverable",
+        variant === "outline" && "border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden",
+        variant === "cards" && "border-separate border-spacing-y-2",
+        className
+      )}
       {...props}
     />
   </div>
@@ -43,7 +53,7 @@ const TableFooter = React.forwardRef<
   <tfoot
     ref={ref}
     className={cn(
-      "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+      "border-t bg-slate-50 dark:bg-slate-800/50 font-medium [&>tr]:last:border-b-0",
       className
     )}
     {...props}
@@ -58,7 +68,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+      "border-b transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-800/50 data-[state=selected]:bg-slate-100 dark:data-[state=selected]:bg-slate-800",
       className
     )}
     {...props}
@@ -73,7 +83,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+      "h-12 px-4 text-left align-middle font-medium text-slate-500 dark:text-slate-400 [&:has([role=checkbox])]:pr-0",
       className
     )}
     {...props}
@@ -99,7 +109,7 @@ const TableCaption = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <caption
     ref={ref}
-    className={cn("mt-4 text-sm text-muted-foreground", className)}
+    className={cn("mt-4 text-sm text-slate-500 dark:text-slate-400", className)}
     {...props}
   />
 ))
@@ -115,3 +125,24 @@ export {
   TableCell,
   TableCaption,
 }
+
+/**
+ * Add these styles to globals.css
+ * 
+ * .table-hoverable tbody tr:hover {
+ *   @apply bg-primary/5;
+ * }
+ * 
+ * .table-striped tbody tr:nth-child(odd) {
+ *   @apply bg-muted/30;
+ * }
+ * 
+ * .table-striped tbody tr:nth-child(even) {
+ *   @apply bg-background;
+ * }
+ * 
+ * .table-compact th,
+ * .table-compact td {
+ *   @apply py-2 px-3;
+ * }
+ */
